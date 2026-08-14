@@ -1,6 +1,9 @@
 .splash {
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 999;
   background: linear-gradient(160deg, #FF7A59 0%, #FF9A76 40%, #FFB6C1 100%);
   display: flex;

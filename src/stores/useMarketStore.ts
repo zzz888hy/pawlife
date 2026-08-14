@@ -1,18 +1,24 @@
 import { create } from 'zustand';
-import type { Product, MarketCategory, CartItem } from '@/types';
+import type { Product, MarketCategory, CartItem, Order, OrderItem, OrderStatus } from '@/types';
 import { mockProducts, mockMarketCategories } from '@/services/mock/market.mock';
+import { generateId } from '@/utils/format';
 
 interface MarketState {
   products: Product[];
   categories: MarketCategory[];
   activeCategory: string;
   cart: CartItem[];
+  orders: Order[];
   loading: boolean;
   fetchProducts: (category?: string) => void;
   setCategory: (cat: string) => void;
   addToCart: (productId: string) => void;
   removeFromCart: (productId: string) => void;
+  clearCart: () => void;
   getProductById: (id: string) => Product | undefined;
+  addProduct: (data: Omit<Product, 'id' | 'sold'>) => Product;
+  placeOrder: (items: OrderItem[], totalPrice: number) => Order;
+  updateOrderStatus: (orderId: string, status: OrderStatus) => void;
 }
 
 export const useMarketStore = create<MarketState>((set, get) => ({
@@ -20,6 +26,7 @@ export const useMarketStore = create<MarketState>((set, get) => ({
   categories: mockMarketCategories,
   activeCategory: '用品',
   cart: [],
+  orders: [],
   loading: false,
 
   fetchProducts: (category?: string) => {
@@ -56,7 +63,38 @@ export const useMarketStore = create<MarketState>((set, get) => ({
     }));
   },
 
+  clearCart: () => set({ cart: [] }),
+
   getProductById: (id: string) => {
     return get().products.find((p) => p.id === id);
+  },
+
+  addProduct: (data: Omit<Product, 'id' | 'sold'>) => {
+    const product: Product = {
+      ...data,
+      id: generateId(),
+      sold: '0',
+    };
+    set((s) => ({ products: [product, ...s.products] }));
+    return product;
+  },
+
+  placeOrder: (items: OrderItem[], totalPrice: number) => {
+    const order: Order = {
+      id: generateId(),
+      orderNo: `PL${Date.now()}`,
+      items,
+      totalPrice: Math.round(totalPrice * 10) / 10,
+      status: 'pending',
+      createdAt: new Date().toISOString(),
+    };
+    set((s) => ({ orders: [order, ...s.orders] }));
+    return order;
+  },
+
+  updateOrderStatus: (orderId: string, status: OrderStatus) => {
+    set((s) => ({
+      orders: s.orders.map((o) => (o.id === orderId ? { ...o, status } : o)),
+    }));
   },
 }));

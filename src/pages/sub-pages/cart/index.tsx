@@ -8,6 +8,7 @@ export default function CartPage() {
   const cart = useMarketStore((s) => s.cart);
   const products = useMarketStore((s) => s.products);
   const removeFromCart = useMarketStore((s) => s.removeFromCart);
+  const placeOrder = useMarketStore((s) => s.placeOrder);
   const showToast = useAppStore((s) => s.showToast);
 
   const cartItems = cart
@@ -36,14 +37,28 @@ export default function CartPage() {
       content: `共 ${cartItems.length} 件商品，合计 ¥${totalPrice.toFixed(1)}`,
       success: (res) => {
         if (res.confirm) {
-          // 模拟下单成功
-          showToast('下单成功！');
-          // 清空购物车中已下单的商品
+          // 生成订单
+          const orderItems = cartItems
+            .filter((item) => item?.product)
+            .map((item) => ({
+              productId: item!.product!.id,
+              name: item!.product!.name,
+              emoji: item!.product!.emoji,
+              bg: item!.product!.bg,
+              price: item!.product!.price,
+              quantity: item!.quantity,
+            }));
+          placeOrder(orderItems, totalPrice);
+          // 清空购物车
           cartItems.forEach((item) => {
             if (item?.product) {
               removeFromCart(item.product.id);
             }
           });
+          showToast('下单成功！');
+          setTimeout(() => {
+            Taro.navigateTo({ url: '/pages/sub-pages/orders/index' });
+          }, 600);
         }
       },
     });

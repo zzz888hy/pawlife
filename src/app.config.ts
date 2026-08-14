@@ -19,6 +19,7 @@ export default defineAppConfig({
         'product-detail/index',
         'pet-story/index',
         'create-post/index',
+        'create-product/index',
         'cart/index',
         'orders/index',
         'wallet/index',

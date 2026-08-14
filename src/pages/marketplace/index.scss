@@ -103,6 +103,55 @@
   padding: 0 16px;
 }
 
+/* 上架商品入口 */
+.market-sell-entry {
+  display: flex;
+  align-items: center;
+  margin: 0 16px 16px;
+  padding: 20px 24px;
+  border-radius: 16px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  .market-sell-icon {
+    width: 72px;
+    height: 72px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #0abfbf, #06d6a0);
+    color: #ffffff;
+    font-size: 40px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+  }
+
+  .market-sell-info {
+    flex: 1;
+    margin-left: 20px;
+  }
+
+  .market-sell-title {
+    display: block;
+    font-size: 28px;
+    color: #333333;
+    font-weight: 600;
+  }
+
+  .market-sell-desc {
+    display: block;
+    font-size: 22px;
+    color: #999999;
+    margin-top: 6px;
+  }
+
+  .market-sell-arrow {
+    font-size: 40px;
+    color: #cccccc;
+  }
+}
+
 .empty-state {
   grid-column: 1 / -1;
   display: flex;

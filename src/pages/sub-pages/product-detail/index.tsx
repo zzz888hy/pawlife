@@ -20,6 +20,7 @@ export default function ProductDetailPage() {
   const productId = (router.params.id as string) || 'p-1';
   const getProductById = useMarketStore((s) => s.getProductById);
   const addToCart = useMarketStore((s) => s.addToCart);
+  const placeOrder = useMarketStore((s) => s.placeOrder);
   const showToast = useAppStore((s) => s.showToast);
 
   const [product, setProduct] = useState<Product | undefined>(undefined);
@@ -48,14 +49,28 @@ export default function ProductDetailPage() {
   };
 
   const handleBuyNow = () => {
-    showToast('正在跳转下单...');
+    // 立即购买：直接生成一笔待付款订单
+    placeOrder(
+      [
+        {
+          productId: product.id,
+          name: product.name,
+          emoji: product.emoji,
+          bg: product.bg,
+          price: product.price,
+          quantity: 1,
+        },
+      ],
+      product.price
+    );
+    showToast('下单成功！');
     setTimeout(() => {
       Taro.navigateTo({ url: '/pages/sub-pages/orders/index' });
     }, 600);
   };
 
   const handleCart = () => {
-    Taro.showToast({ title: '购物车功能开发中', icon: 'none' });
+    Taro.navigateTo({ url: '/pages/sub-pages/cart/index' });
   };
 
   return (

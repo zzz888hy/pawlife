@@ -9,18 +9,18 @@ import CustomTabBar from '@/components/CustomTabBar';
 import './index.scss';
 
 const MARKET_CATEGORIES = [
-  { key: 'supplies', label: '用品', emoji: '🦴' },
-  { key: 'food', label: '食品', emoji: '🍖' },
-  { key: 'service', label: '服务', emoji: '✂️' },
-  { key: 'fashion', label: '穿搭', emoji: '👕' },
-  { key: 'memorial', label: '纪念', emoji: '🖼️' },
-  { key: 'medical', label: '医疗', emoji: '💊' },
+  { key: '用品', label: '用品', emoji: '🦴' },
+  { key: '食品', label: '食品', emoji: '🍖' },
+  { key: '服务', label: '服务', emoji: '✂️' },
+  { key: '穿搭', label: '穿搭', emoji: '👕' },
+  { key: '纪念', label: '纪念', emoji: '🖼️' },
+  { key: '医疗', label: '医疗', emoji: '💊' },
 ];
 
 export default function MarketplacePage() {
   const { products, fetchProducts } = useMarketStore();
   const { isLoggedIn } = useAppStore();
-  const [activeCategory, setActiveCategory] = useState('supplies');
+  const [activeCategory, setActiveCategory] = useState('用品');
 
   useEffect(() => {
     fetchProducts();
@@ -28,7 +28,10 @@ export default function MarketplacePage() {
 
   const handleCategoryTap = (key: string) => {
     setActiveCategory(key);
-    fetchProducts(key);
+  };
+
+  const handleSellTap = () => {
+    Taro.navigateTo({ url: '/pages/sub-pages/create-product/index' });
   };
 
   const handleProductTap = (id: string) => {
@@ -69,6 +72,18 @@ export default function MarketplacePage() {
           </View>
         ))}
       </ScrollView>
+
+      {/* 上架商品入口 */}
+      <View className="market-sell-entry" onClick={handleSellTap}>
+        <View className="market-sell-icon">
+          <Text>＋</Text>
+        </View>
+        <View className="market-sell-info">
+          <Text className="market-sell-title">我要上架</Text>
+          <Text className="market-sell-desc">把你的好物分享给更多铲屎官</Text>
+        </View>
+        <Text className="market-sell-arrow">›</Text>
+      </View>
 
       {/* Product Grid */}
       <View className="product-grid">
