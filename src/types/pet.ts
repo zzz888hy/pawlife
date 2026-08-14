@@ -52,3 +52,15 @@ export interface WeightRecord {
   weight: number;
   unit: string;
 }
+
+export type IdentityStatus = 'unverified' | 'reviewing' | 'verified';
+
+export interface PetIdentity {
+  id: string;
+  petId: string;
+  status: IdentityStatus;
+  chipNo: string;
+  vaccineNo: string;
+  pedigree: string;
+  submittedAt: string;
+}

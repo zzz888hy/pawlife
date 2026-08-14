@@ -1,72 +1,206 @@
 .identity-page {
   min-height: 100vh;
   background: #FFF8F3;
+  padding-bottom: 160rpx;
 }
 
-.identity-body {
-  padding: 24rpx;
+.identity-scroll {
+  height: 100vh;
 }
 
-.identity-card {
-  background: #fff;
+.identity-hero {
+  background: linear-gradient(135deg, #FF7A59, #FF9A76);
+  margin: 20rpx 24rpx;
   border-radius: 32rpx;
   padding: 48rpx 32rpx;
   text-align: center;
-  margin-bottom: 24rpx;
+  color: #fff;
 }
 
-.identity-icon {
-  font-size: 100rpx;
+.identity-hero-icon {
+  font-size: 88rpx;
+  display: block;
 }
 
-.identity-title {
-  font-size: 32rpx;
+.identity-hero-title {
+  font-size: 34rpx;
   font-weight: 700;
   display: block;
-  margin-top: 20rpx;
+  margin-top: 16rpx;
 }
 
-.identity-desc {
+.identity-hero-desc {
   font-size: 24rpx;
-  color: #9B958E;
+  opacity: 0.92;
   line-height: 1.6;
   display: block;
   margin-top: 16rpx;
 }
 
-.identity-status {
-  background: #fff;
-  border-radius: 32rpx;
-  padding: 28rpx 32rpx;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 40rpx;
+.identity-section {
+  margin: 20rpx 24rpx;
 }
 
-.identity-status-label {
+.identity-label {
   font-size: 28rpx;
-  font-weight: 600;
+  font-weight: 700;
+  color: #2D2A26;
+  display: block;
+  margin-bottom: 16rpx;
 }
 
-.identity-status-value {
-  font-size: 26rpx;
-  font-weight: 600;
+.identity-no-pet {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  text-align: center;
+}
 
-  &.pending {
-    color: #FF9800;
-    background: #FFF3E0;
-    padding: 8rpx 20rpx;
-    border-radius: 20rpx;
+.identity-no-pet-text {
+  font-size: 26rpx;
+  color: #9B958E;
+  display: block;
+}
+
+.identity-no-pet-btn {
+  display: inline-block;
+  margin-top: 20rpx;
+  background: linear-gradient(135deg, #FF7A59, #FF9A76);
+  color: #fff;
+  font-size: 26rpx;
+  padding: 16rpx 48rpx;
+  border-radius: 40rpx;
+}
+
+.identity-pet-row {
+  white-space: nowrap;
+}
+
+.identity-pet-chip {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  background: #fff;
+  border: 3rpx solid transparent;
+  border-radius: 24rpx;
+  padding: 24rpx 32rpx;
+  margin-right: 16rpx;
+
+  &.active {
+    border-color: #FF7A59;
+    background: #FFF0EA;
   }
 }
 
-.identity-btn {
+.identity-pet-avatar {
+  font-size: 56rpx;
+}
+
+.identity-pet-name {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2D2A26;
+  margin-top: 8rpx;
+}
+
+.identity-pet-breed {
+  font-size: 22rpx;
+  color: #9B958E;
+  margin-top: 4rpx;
+}
+
+.identity-status-banner {
+  border-radius: 24rpx;
+  padding: 24rpx 28rpx;
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.identity-status-emoji {
+  font-size: 48rpx;
+}
+
+.identity-status-info {
+  flex: 1;
+}
+
+.identity-status-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  display: block;
+}
+
+.identity-status-desc {
+  font-size: 24rpx;
+  color: #6B6560;
+  line-height: 1.5;
+  display: block;
+  margin-top: 4rpx;
+}
+
+.identity-form-card {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 8rpx 28rpx;
+}
+
+.identity-field {
+  padding: 24rpx 0;
+  border-bottom: 1rpx solid #FAF5F0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.identity-field-label {
+  font-size: 26rpx;
+  color: #6B6560;
+  display: block;
+  margin-bottom: 12rpx;
+}
+
+.identity-input {
+  height: 60rpx;
+  font-size: 28rpx;
+  color: #2D2A26;
+}
+
+.identity-textarea {
+  width: 100%;
+  min-height: 120rpx;
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.identity-placeholder {
+  color: #B8B2A8;
+}
+
+.identity-bottom-safe {
+  height: 40rpx;
+}
+
+.identity-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 24rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1rpx solid #F0E8E0;
+}
+
+.identity-submit-btn {
+  width: 100%;
   background: linear-gradient(135deg, #FF7A59, #FF9A76);
   color: #fff;
   text-align: center;
-  padding: 28rpx;
+  padding: 26rpx;
   border-radius: 48rpx;
   font-size: 30rpx;
-  font-weight: 600;
+  font-weight: 700;
+  box-shadow: 0 8rpx 24rpx rgba(255, 122, 89, 0.3);
 }

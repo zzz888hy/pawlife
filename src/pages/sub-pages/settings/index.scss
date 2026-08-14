@@ -3,14 +3,15 @@
   background: #FFF8F3;
 }
 
-.settings-body {
-  padding: 24rpx;
+.settings-scroll {
+  height: 100vh;
 }
 
 .settings-section {
   background: #fff;
-  border-radius: 32rpx;
+  border-radius: 24rpx;
   overflow: hidden;
+  margin: 20rpx 24rpx;
 }
 
 .settings-item {
@@ -47,9 +48,84 @@
   color: #9B958E;
 }
 
+/* 个人资料编辑态 */
+.settings-edit {
+  padding: 24rpx 32rpx 32rpx;
+  border-top: 1rpx solid #FAF5F0;
+  background: #FFFDFB;
+}
+
+.settings-edit-row {
+  margin-bottom: 24rpx;
+}
+
+.settings-edit-label {
+  font-size: 26rpx;
+  color: #6B6560;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.settings-avatar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.settings-avatar-option {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 50%;
+  background: #F5F0EA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40rpx;
+  border: 3rpx solid transparent;
+
+  &.active {
+    border-color: #FF7A59;
+    background: #FFF0EA;
+  }
+}
+
+.settings-edit-input {
+  height: 72rpx;
+  font-size: 28rpx;
+  border: 2rpx solid #F0E8E0;
+  border-radius: 16rpx;
+  padding: 0 20rpx;
+  box-sizing: border-box;
+}
+
+.settings-edit-actions {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 8rpx;
+}
+
+.settings-edit-btn {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx;
+  border-radius: 40rpx;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.settings-edit-btn-ghost {
+  border: 2rpx solid #F0E8E0;
+  color: #6B6560;
+}
+
+.settings-edit-btn-primary {
+  background: linear-gradient(135deg, #FF7A59, #FF9A76);
+  color: #fff;
+}
+
 .settings-footer {
   text-align: center;
-  padding: 60rpx 0;
+  padding: 40rpx 0 60rpx;
 }
 
 .settings-version {

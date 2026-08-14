@@ -20,16 +20,16 @@ const MENU_SECTION_2 = [
   { key: 'about', label: '关于PawLife', icon: 'ℹ️', url: '' },
 ];
 
-const STATS = [
-  { key: 'days', label: '陪伴天数', value: '0', unit: '天' },
-  { key: 'records', label: '成长记录', value: '0', unit: '条' },
-  { key: 'pets', label: '我的宠物', value: '0', unit: '只' },
-  { key: 'coins', label: '宠物金币', value: '0', unit: '个' },
-];
-
 export default function ProfilePage() {
-  const { userInfo } = useUserStore();
+  const { nickname, avatar, userId, companionDays, coins, petCount, recordCount } = useUserStore();
   const { tasks, fetchTasks } = useTaskStore();
+
+  const STATS = [
+    { key: 'days', label: '陪伴天数', value: `${companionDays}`, unit: '天' },
+    { key: 'records', label: '成长记录', value: `${recordCount}`, unit: '条' },
+    { key: 'pets', label: '我的宠物', value: `${petCount}`, unit: '只' },
+    { key: 'coins', label: '宠物金币', value: `${coins}`, unit: '个' },
+  ];
 
   useEffect(() => {
     fetchTasks();
@@ -63,16 +63,16 @@ export default function ProfilePage() {
         <View className="header-avatar-wrap">
           <View className="header-avatar">
             <Text className="avatar-placeholder">
-              {userInfo?.avatar ? '' : '🐱'}
+              {avatar}
             </Text>
           </View>
         </View>
-        <Text className="header-name">{userInfo?.nickName || 'PawLife用户'}</Text>
-        <Text className="header-id">ID: {userInfo?.id || 'PL000000'}</Text>
+        <Text className="header-name">{nickname || 'PawLife用户'}</Text>
+        <Text className="header-id">ID: {userId || 'PL000000'}</Text>
         <View className="header-companion">
           <Text className="companion-icon">⏱️</Text>
           <Text className="companion-text">
-            已陪伴 {userInfo?.companionDays || 0} 天
+            已陪伴 {companionDays || 0} 天
           </Text>
         </View>
       </View>
@@ -114,7 +114,7 @@ export default function ProfilePage() {
             </View>
             <View className="task-coin-display">
               <Text className="coin-icon">🪙</Text>
-              <Text className="coin-count">{userInfo?.coins || 0}</Text>
+              <Text className="coin-count">{coins || 0}</Text>
             </View>
           </View>
           <View className="task-list">
