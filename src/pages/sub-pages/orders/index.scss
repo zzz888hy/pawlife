@@ -1,0 +1,31 @@
+.orders-page {
+  min-height: 100vh;
+  background: #FFF8F3;
+}
+
+.orders-body {
+  padding: 24rpx;
+}
+
+.order-tabs {
+  display: flex;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 8rpx;
+  margin-top: 24rpx;
+}
+
+.order-tab {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  font-size: 26rpx;
+  color: #9B958E;
+  border-radius: 20rpx;
+
+  &.active {
+    background: linear-gradient(135deg, #FF7A59, #FF9A76);
+    color: #fff;
+    font-weight: 600;
+  }
+}

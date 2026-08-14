@@ -1,0 +1,35 @@
+.category-tabs {
+  white-space: nowrap;
+  padding: 0 32rpx;
+
+  &-inner {
+    display: inline-flex;
+    gap: 36rpx;
+    padding-bottom: 8rpx;
+  }
+}
+
+.category-tab {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #9B958E;
+  white-space: nowrap;
+  position: relative;
+  padding-bottom: 12rpx;
+
+  &.active {
+    color: #2D2A26;
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 40rpx;
+      height: 6rpx;
+      background: #FF7A59;
+      border-radius: 4rpx;
+    }
+  }
+}

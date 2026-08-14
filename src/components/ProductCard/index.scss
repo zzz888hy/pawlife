@@ -1,0 +1,55 @@
+.product-card {
+  background: #fff;
+  border-radius: 28rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.06);
+}
+
+.product-img {
+  height: 260rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 120rpx;
+}
+
+.product-info {
+  padding: 20rpx;
+}
+
+.product-name {
+  font-size: 26rpx;
+  font-weight: 600;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 68rpx;
+}
+
+.product-price-row {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: baseline;
+  gap: 8rpx;
+}
+
+.product-price {
+  color: #FF7A59;
+  font-weight: 700;
+  font-size: 30rpx;
+}
+
+.product-old-price {
+  font-size: 22rpx;
+  color: #9B958E;
+  text-decoration: line-through;
+}
+
+.product-sold {
+  font-size: 20rpx;
+  color: #9B958E;
+  margin-top: 6rpx;
+  display: block;
+}

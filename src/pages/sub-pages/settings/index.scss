@@ -1,0 +1,58 @@
+.settings-page {
+  min-height: 100vh;
+  background: #FFF8F3;
+}
+
+.settings-body {
+  padding: 24rpx;
+}
+
+.settings-section {
+  background: #fff;
+  border-radius: 32rpx;
+  overflow: hidden;
+}
+
+.settings-item {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  padding: 28rpx 32rpx;
+  border-bottom: 1rpx solid #FAF5F0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.settings-item-icon {
+  font-size: 36rpx;
+  width: 56rpx;
+  text-align: center;
+}
+
+.settings-item-title {
+  flex: 1;
+  font-size: 28rpx;
+  color: #2D2A26;
+}
+
+.settings-item-value {
+  font-size: 24rpx;
+  color: #9B958E;
+}
+
+.settings-item-arrow {
+  font-size: 32rpx;
+  color: #9B958E;
+}
+
+.settings-footer {
+  text-align: center;
+  padding: 60rpx 0;
+}
+
+.settings-version {
+  font-size: 24rpx;
+  color: #9B958E;
+}

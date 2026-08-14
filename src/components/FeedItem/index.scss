@@ -1,0 +1,139 @@
+.feed-item {
+  background: #fff;
+  border-radius: 32rpx;
+  margin: 0 24rpx 24rpx;
+  overflow: hidden;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.06);
+}
+
+.feed-head {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 28rpx 20rpx;
+}
+
+.feed-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  flex-shrink: 0;
+}
+
+.feed-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.feed-name {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.feed-tag {
+  font-size: 20rpx;
+  color: #FF7A59;
+  background: #FFF0EA;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-weight: 600;
+  margin-left: 8rpx;
+}
+
+.feed-meta {
+  font-size: 22rpx;
+  color: #9B958E;
+  margin-top: 4rpx;
+  display: block;
+}
+
+.feed-pics {
+  gap: 4rpx;
+
+  &.one {
+    padding: 0 28rpx 24rpx;
+  }
+
+  &.two {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 0 28rpx 24rpx;
+  }
+}
+
+.feed-pic {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 120rpx;
+  border-radius: 24rpx;
+
+  &--large {
+    width: 100%;
+    height: 480rpx;
+    font-size: 120rpx;
+  }
+
+  .two & {
+    height: 280rpx;
+    font-size: 100rpx;
+  }
+}
+
+.feed-body {
+  padding: 0 28rpx 24rpx;
+}
+
+.feed-txt {
+  font-size: 28rpx;
+  line-height: 1.6;
+  margin-bottom: 16rpx;
+  display: block;
+}
+
+.feed-tags {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+}
+
+.feed-tag-item {
+  font-size: 22rpx;
+  color: #FF7A59;
+  background: #FFF0EA;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.feed-actions {
+  display: flex;
+  align-items: center;
+  gap: 40rpx;
+  padding: 16rpx 28rpx 24rpx;
+  border-top: 1rpx solid #FAF5F0;
+  color: #9B958E;
+  font-size: 24rpx;
+}
+
+.feed-act {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  transition: all 0.2s;
+
+  &.liked {
+    color: #FF7A59;
+  }
+
+  &-ico {
+    font-size: 36rpx;
+  }
+
+  &--right {
+    margin-left: auto;
+  }
+}

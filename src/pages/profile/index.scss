@@ -1,0 +1,358 @@
+.profile-page {
+  min-height: 100vh;
+  background-color: #f5f6fa;
+}
+
+/* Header */
+.mine-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px 60px;
+  background: linear-gradient(180deg, #ff8c42 0%, #ff6b35 50%, #ff7b4a 100%);
+  border-bottom-left-radius: 40px;
+  border-bottom-right-radius: 40px;
+  color: #ffffff;
+
+  .header-avatar-wrap {
+    margin-bottom: 16px;
+  }
+
+  .header-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.25);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 4px solid rgba(255, 255, 255, 0.4);
+
+    .avatar-placeholder {
+      font-size: 56px;
+      line-height: 1;
+    }
+  }
+
+  .header-name {
+    font-size: 36px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .header-id {
+    font-size: 24px;
+    color: rgba(255, 255, 255, 0.75);
+    margin-bottom: 12px;
+  }
+
+  .header-companion {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    .companion-icon {
+      font-size: 24px;
+    }
+
+    .companion-text {
+      font-size: 24px;
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+}
+
+/* VIP Card */
+.vip-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: -36px 16px 0;
+  padding: 20px 24px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  position: relative;
+  z-index: 2;
+  border: 1px solid rgba(212, 175, 55, 0.3);
+
+  .vip-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .vip-icon {
+    font-size: 48px;
+    line-height: 1;
+  }
+
+  .vip-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .vip-title {
+    font-size: 28px;
+    font-weight: 600;
+    color: #ffd700;
+  }
+
+  .vip-desc {
+    font-size: 22px;
+    color: rgba(255, 215, 0, 0.6);
+  }
+
+  .vip-card-right {
+    display: flex;
+    align-items: baseline;
+    gap: 2px;
+  }
+
+  .vip-price {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ffd700;
+    font-family: 'DIN', monospace;
+  }
+
+  .vip-unit {
+    font-size: 22px;
+    color: rgba(255, 215, 0, 0.6);
+  }
+}
+
+/* Body */
+.mine-body {
+  padding-top: 24px;
+  padding-bottom: 40px;
+}
+
+/* Stats Bar */
+.mine-stats {
+  display: flex;
+  flex-direction: row;
+  margin: 0 16px 16px;
+  padding: 20px 8px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  .stat-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    position: relative;
+
+    &:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 20%;
+      height: 60%;
+      width: 1px;
+      background-color: #eeeeee;
+    }
+  }
+
+  .stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    color: #ff6b35;
+    font-family: 'DIN', monospace;
+  }
+
+  .stat-unit {
+    font-size: 20px;
+    color: #ff6b35;
+    font-weight: 500;
+    margin-top: -4px;
+  }
+
+  .stat-label {
+    font-size: 22px;
+    color: #999999;
+    margin-top: 4px;
+  }
+}
+
+/* Task Card */
+.task-card {
+  margin: 0 16px 16px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fff7ed 0%, #fef3c7 100%);
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  .task-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .task-title-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .task-title-icon {
+    font-size: 32px;
+  }
+
+  .task-title {
+    font-size: 30px;
+    font-weight: 700;
+    color: #333333;
+  }
+
+  .task-coin-display {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    border-radius: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+
+    .coin-icon {
+      font-size: 24px;
+    }
+
+    .coin-count {
+      font-size: 26px;
+      font-weight: 700;
+      color: #f59e0b;
+    }
+  }
+
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .task-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background-color: #ffffff;
+    transition: opacity 0.2s;
+
+    &.done {
+      opacity: 0.6;
+    }
+
+    .task-item-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .task-item-icon {
+      font-size: 32px;
+    }
+
+    .task-item-name {
+      font-size: 26px;
+      color: #333333;
+      font-weight: 500;
+    }
+
+    .task-item-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .task-item-reward {
+      font-size: 24px;
+      color: #f59e0b;
+      font-weight: 600;
+    }
+
+    .task-go-btn {
+      padding: 6px 16px;
+      border-radius: 20px;
+      background: linear-gradient(135deg, #f59e0b, #d97706);
+      color: #ffffff;
+      font-size: 22px;
+      font-weight: 500;
+    }
+
+    .task-done-check {
+      font-size: 28px;
+      color: #10b981;
+      font-weight: 700;
+    }
+  }
+
+  .task-empty {
+    display: flex;
+    justify-content: center;
+    padding: 20px 0;
+
+    .task-empty-text {
+      font-size: 24px;
+      color: #999999;
+    }
+  }
+}
+
+/* Menu Sections */
+.mine-section {
+  margin: 0 16px 16px;
+  border-radius: 16px;
+  background-color: #ffffff;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+
+  .menu-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 24px 20px;
+    border-bottom: 1px solid #f5f5f5;
+    transition: background-color 0.15s;
+
+    &:active {
+      background-color: #f9f9f9;
+    }
+
+    &.last {
+      border-bottom: none;
+    }
+
+    .menu-item-left {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .menu-icon {
+      font-size: 36px;
+      line-height: 1;
+    }
+
+    .menu-label {
+      font-size: 28px;
+      color: #333333;
+      font-weight: 500;
+    }
+
+    .menu-arrow {
+      font-size: 32px;
+      color: #cccccc;
+      font-weight: 300;
+    }
+  }
+}
+
+.bottom-spacer {
+  height: 20px;
+}

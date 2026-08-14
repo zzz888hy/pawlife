@@ -1,0 +1,32 @@
+.skeleton-list {
+  padding: 24rpx;
+}
+
+.skeleton-card {
+  background: #fff;
+  border-radius: 32rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.skeleton-line {
+  height: 28rpx;
+  background: #F0E8E0;
+  border-radius: 8rpx;
+  margin-bottom: 16rpx;
+  animation: shimmer 1.5s infinite;
+
+  &--short {
+    width: 40%;
+  }
+
+  &--long {
+    width: 80%;
+  }
+}
+
+@keyframes shimmer {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}

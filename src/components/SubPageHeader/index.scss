@@ -1,0 +1,38 @@
+.sub-header {
+  height: 96rpx;
+  display: flex;
+  align-items: center;
+  padding: 0 24rpx;
+  background: #fff;
+  border-bottom: 1rpx solid #F0E8E0;
+  flex-shrink: 0;
+
+  &--dark {
+    background: #1a1a2e;
+    border: none;
+
+    .sub-header-back, .sub-header-title {
+      color: #fff;
+    }
+  }
+
+  &-back {
+    font-size: 44rpx;
+    cursor: pointer;
+    padding: 12rpx 16rpx;
+    color: #2D2A26;
+    width: 80rpx;
+  }
+
+  &-title {
+    flex: 1;
+    text-align: center;
+    font-size: 32rpx;
+    font-weight: 600;
+    color: #2D2A26;
+  }
+
+  &-spacer {
+    width: 80rpx;
+  }
+}

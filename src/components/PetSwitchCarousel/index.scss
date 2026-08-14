@@ -1,0 +1,51 @@
+.pet-switch {
+  white-space: nowrap;
+  padding: 28rpx 32rpx;
+
+  &-inner {
+    display: inline-flex;
+    gap: 20rpx;
+  }
+}
+
+.pet-switch-item {
+  flex-shrink: 0;
+  text-align: center;
+  width: 120rpx;
+
+  &.active .pet-switch-avatar {
+    border-color: #FF7A59;
+  }
+
+  &.active .pet-switch-name {
+    color: #FF7A59;
+    font-weight: 600;
+  }
+}
+
+.pet-switch-avatar {
+  width: 104rpx;
+  height: 104rpx;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56rpx;
+  border: 4rpx solid transparent;
+  box-shadow: 0 4rpx 24rpx rgba(0, 0, 0, 0.06);
+  margin: 0 auto;
+
+  &.add {
+    border: 4rpx dashed #F0E8E0;
+    color: #9B958E;
+    font-size: 48rpx;
+  }
+}
+
+.pet-switch-name {
+  font-size: 22rpx;
+  margin-top: 8rpx;
+  color: #9B958E;
+  display: block;
+}

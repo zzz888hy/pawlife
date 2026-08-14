@@ -1,0 +1,75 @@
+export default defineAppConfig({
+  pages: [
+    'pages/index/index',
+    'pages/hall/index',
+    'pages/pet-center/index',
+    'pages/post-modal/index',
+    'pages/marketplace/index',
+    'pages/profile/index',
+  ],
+  subPackages: [
+    {
+      root: 'pages/sub-pages/',
+      pages: [
+        'ai-assistant/index',
+        'memorial-hall/index',
+        'create-pet/index',
+        'health-records/index',
+        'vip-membership/index',
+        'product-detail/index',
+        'pet-story/index',
+        'create-post/index',
+        'cart/index',
+        'orders/index',
+        'wallet/index',
+        'settings/index',
+        'pet-identity/index',
+      ],
+    },
+  ],
+  window: {
+    backgroundTextStyle: 'light',
+    navigationBarBackgroundColor: '#FFF8F3',
+    navigationBarTitleText: 'PawLife',
+    navigationBarTextStyle: 'black',
+  },
+  tabBar: {
+    color: '#9B958E',
+    selectedColor: '#FF7A59',
+    backgroundColor: '#FFFFFF',
+    borderStyle: 'white',
+    custom: true,
+    list: [
+      {
+        pagePath: 'pages/hall/index',
+        text: '大厅',
+        iconPath: 'assets/tabbar/home.png',
+        selectedIconPath: 'assets/tabbar/home.png',
+      },
+      {
+        pagePath: 'pages/pet-center/index',
+        text: '宠物馆',
+        iconPath: 'assets/tabbar/paw.png',
+        selectedIconPath: 'assets/tabbar/paw.png',
+      },
+      {
+        pagePath: 'pages/post-modal/index',
+        text: '发布',
+        iconPath: 'assets/tabbar/plus.png',
+        selectedIconPath: 'assets/tabbar/plus.png',
+      },
+      {
+        pagePath: 'pages/marketplace/index',
+        text: '集市',
+        iconPath: 'assets/tabbar/shop.png',
+        selectedIconPath: 'assets/tabbar/shop.png',
+      },
+      {
+        pagePath: 'pages/profile/index',
+        text: '我的',
+        iconPath: 'assets/tabbar/user.png',
+        selectedIconPath: 'assets/tabbar/user.png',
+      },
+    ],
+  },
+});

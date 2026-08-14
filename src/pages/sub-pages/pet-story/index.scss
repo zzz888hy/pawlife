@@ -1,0 +1,202 @@
+.pet-story-page {
+  min-height: 100vh;
+  background: #f5f5f5;
+  display: flex;
+  flex-direction: column;
+}
+
+.ps-scroll {
+  flex: 1;
+  padding: 24rpx 32rpx;
+}
+
+// ===== Story Header =====
+.ps-head {
+  background: linear-gradient(135deg, #ff9a56, #ff6b6b);
+  border-radius: 24rpx;
+  padding: 40rpx 32rpx;
+  text-align: center;
+  margin-bottom: 24rpx;
+}
+
+.ps-head-icon {
+  font-size: 72rpx;
+  display: block;
+  margin-bottom: 16rpx;
+}
+
+.ps-head-title {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 12rpx;
+}
+
+.ps-head-sub {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+
+// ===== Style Selector Card =====
+.ps-gen-card {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+}
+
+.ps-gen-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 24rpx;
+}
+
+.ps-styles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-bottom: 32rpx;
+}
+
+.ps-style-chip {
+  padding: 14rpx 28rpx;
+  background: #f5f5f5;
+  border-radius: 40rpx;
+  font-size: 26rpx;
+  color: #666;
+  border: 2rpx solid transparent;
+  transition: all 0.2s;
+
+  &.selected {
+    background: #fff8f5;
+    border-color: #ff9a56;
+    color: #ff6b6b;
+    font-weight: 600;
+  }
+}
+
+.ps-gen-btn {
+  height: 88rpx;
+  background: linear-gradient(135deg, #ff9a56, #ff6b6b);
+  border-radius: 44rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  &:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+}
+
+.ps-gen-btn-text {
+  font-size: 30rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+// ===== Story Preview Card =====
+.ps-preview {
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 32rpx;
+  animation: psSlideUp 0.4s ease;
+}
+
+@keyframes psSlideUp {
+  from {
+    opacity: 0;
+    transform: translateY(32rpx);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.ps-preview-header {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+  padding-bottom: 24rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  margin-bottom: 24rpx;
+}
+
+.ps-preview-icon {
+  font-size: 40rpx;
+}
+
+.ps-preview-title {
+  flex: 1;
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #333;
+}
+
+.ps-preview-style-badge {
+  font-size: 22rpx;
+  color: #ff9a56;
+  background: #fff5ee;
+  padding: 4rpx 16rpx;
+  border-radius: 16rpx;
+}
+
+.ps-preview-body {
+  margin-bottom: 32rpx;
+}
+
+.ps-preview-paragraph {
+  display: block;
+  font-size: 30rpx;
+  color: #444;
+  line-height: 2;
+  text-indent: 2em;
+  margin-bottom: 24rpx;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.ps-preview-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.ps-preview-btn {
+  flex: 1;
+  height: 80rpx;
+  border-radius: 40rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28rpx;
+  font-weight: 600;
+  transition: all 0.2s;
+
+  &:active {
+    transform: scale(0.97);
+    opacity: 0.9;
+  }
+}
+
+.ps-preview-btn-save {
+  background: #fff5ee;
+  color: #ff6b6b;
+  border: 2rpx solid #ff9a56;
+}
+
+.ps-preview-btn-share {
+  background: linear-gradient(135deg, #ff9a56, #ff6b6b);
+  color: #fff;
+}
+
+// ===== Bottom Safe =====
+.ps-bottom-safe {
+  height: 40rpx;
+}

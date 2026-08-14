@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.taro-cache/
+.swc/
+*.log
+.DS_Store
+.idea/
+.vscode/
+project.private.config.json
+cloudfunctions/*/node_modules/

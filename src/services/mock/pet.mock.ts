@@ -1,0 +1,75 @@
+import type { Pet, TimelineEntry } from '@/types';
+
+export const mockPets: Pet[] = [
+  {
+    id: 'pet-1',
+    name: '豆豆',
+    type: '狗',
+    breed: '金毛寻回犬',
+    birthday: '2021-05-06',
+    gender: '♂ 男孩',
+    personality: '贪吃、爱撒娇、怕下雨',
+    hobbies: '球、散步、睡觉',
+    avatar: '🐕',
+    photos: ['🐕', '🌊', '🎂'],
+    age: 3,
+    createdAt: '2021-05-06',
+  },
+  {
+    id: 'pet-2',
+    name: '橘子',
+    type: '猫',
+    breed: '橘猫',
+    birthday: '2022-03-15',
+    gender: '♀ 女孩',
+    personality: '高冷、贪睡、爱抓沙发',
+    hobbies: '睡觉、吃饭、看窗外',
+    avatar: '🐱',
+    photos: ['🐱', '😴', '🍚'],
+    age: 2,
+    createdAt: '2022-03-15',
+  },
+];
+
+export const mockTimeline: TimelineEntry[] = [
+  {
+    id: 'tl-1',
+    petId: 'pet-1',
+    date: '2024.07.15',
+    title: '第一次海边旅行',
+    desc: '豆豆第一次看到大海，兴奋地冲进浪里，变成一只咸水狗',
+    emoji: '🌊',
+  },
+  {
+    id: 'tl-2',
+    petId: 'pet-1',
+    date: '2024.05.06',
+    title: '3岁生日',
+    desc: '给豆豆办了生日趴，邀请了3只小伙伴，吃了定制蛋糕',
+    emoji: '🎂',
+  },
+  {
+    id: 'tl-3',
+    petId: 'pet-1',
+    date: '2024.03.20',
+    title: '陪主人搬家',
+    desc: '从老房子搬到新家，豆豆最先占领了阳台的阳光位',
+    emoji: '📦',
+  },
+  {
+    id: 'tl-4',
+    petId: 'pet-1',
+    date: '2023.06.01',
+    title: '第一次游泳',
+    desc: '在游泳池学会游泳，从此爱上了水，每周都要去',
+    emoji: '🏊',
+  },
+  {
+    id: 'tl-5',
+    petId: 'pet-1',
+    date: '2021.05.06',
+    title: '豆豆来到家',
+    desc: '一只毛茸茸的小金毛被放在门口，从此有了一个永远的家',
+    emoji: '🏠',
+  },
+];

@@ -1,0 +1,16 @@
+.progress-bar {
+  display: flex;
+  gap: 12rpx;
+  margin-bottom: 48rpx;
+}
+
+.progress-step {
+  flex: 1;
+  height: 8rpx;
+  background: #F0E8E0;
+  border-radius: 4rpx;
+
+  &.done {
+    background: #FF7A59;
+  }
+}

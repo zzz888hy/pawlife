@@ -1,0 +1,18 @@
+.section-title {
+  font-size: 34rpx;
+  font-weight: 700;
+  padding: 32rpx 32rpx 20rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  &-text {
+    color: #2D2A26;
+  }
+
+  &-more {
+    font-size: 24rpx;
+    color: #9B958E;
+    font-weight: 400;
+  }
+}

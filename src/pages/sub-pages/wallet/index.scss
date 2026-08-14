@@ -1,0 +1,96 @@
+.wallet-page {
+  min-height: 100vh;
+  background: #FFF8F3;
+}
+
+.wallet-body {
+  padding: 24rpx;
+}
+
+.wallet-balance-card {
+  background: linear-gradient(135deg, #FF7A59, #FF9A76);
+  border-radius: 32rpx;
+  padding: 40rpx;
+  color: #fff;
+  text-align: center;
+}
+
+.wallet-label {
+  font-size: 26rpx;
+  opacity: 0.9;
+}
+
+.wallet-balance {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  margin: 20rpx 0;
+}
+
+.wallet-coin-icon {
+  font-size: 56rpx;
+}
+
+.wallet-amount {
+  font-size: 72rpx;
+  font-weight: 800;
+}
+
+.wallet-hint {
+  font-size: 22rpx;
+  opacity: 0.8;
+  margin-top: 12rpx;
+}
+
+.wallet-history {
+  background: #fff;
+  border-radius: 32rpx;
+  padding: 24rpx;
+  margin-top: 24rpx;
+}
+
+.wallet-section-title {
+  font-size: 30rpx;
+  font-weight: 700;
+  margin-bottom: 20rpx;
+}
+
+.wallet-record {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #FAF5F0;
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.wallet-record-icon {
+  font-size: 40rpx;
+  width: 64rpx;
+  text-align: center;
+}
+
+.wallet-record-info {
+  flex: 1;
+}
+
+.wallet-record-name {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.wallet-record-date {
+  font-size: 22rpx;
+  color: #9B958E;
+  margin-top: 4rpx;
+}
+
+.wallet-record-amount {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #FF7A59;
+}
