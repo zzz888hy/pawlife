@@ -8,10 +8,10 @@ import { useAppStore } from '@/stores/useAppStore';
 import type { IdentityStatus } from '@/types';
 import './index.scss';
 
-const STATUS_MAP: Record<IdentityStatus, { label: string; color: string; emoji: string }> = {
-  unverified: { label: '未认证', color: '#FF9800', emoji: '🕐' },
-  reviewing: { label: '审核中', color: '#2F80ED', emoji: '⏳' },
-  verified: { label: '已认证', color: '#52C41A', emoji: '✅' },
+const STATUS_MAP: Record<IdentityStatus, { label: string; color: string; bg: string; emoji: string }> = {
+  unverified: { label: '未认证', color: '#FF9800', bg: '#FFF3E0', emoji: '🕐' },
+  reviewing: { label: '审核中', color: '#2F80ED', bg: '#EAF3FE', emoji: '⏳' },
+  verified: { label: '已认证', color: '#52C41A', bg: '#EDF7E6', emoji: '✅' },
 };
 
 export default function PetIdentityPage() {
@@ -110,7 +110,7 @@ export default function PetIdentityPage() {
           <Text className='identity-label'>认证状态</Text>
           <View
             className='identity-status-banner'
-            style={{ backgroundColor: STATUS_MAP[status].color + '1a' }}
+            style={{ backgroundColor: STATUS_MAP[status].bg }}
           >
             <Text className='identity-status-emoji'>{STATUS_MAP[status].emoji}</Text>
             <View className='identity-status-info'>

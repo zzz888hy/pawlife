@@ -11,7 +11,9 @@ type SubPageName =
   | 'orders'
   | 'wallet'
   | 'settings'
-  | 'pet-identity';
+  | 'pet-identity'
+  | 'rank'
+  | 'search';
 
 type TabName = 'hall' | 'pet-center' | 'post-modal' | 'marketplace' | 'profile';
 

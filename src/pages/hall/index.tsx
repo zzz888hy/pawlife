@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Input } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useFeedStore } from '@/stores/useFeedStore';
 import { useAppStore } from '@/stores/useAppStore';
 import FeedItem from '@/components/FeedItem';
+import CommentSheet from '@/components/CommentSheet';
 import CustomTabBar from '@/components/CustomTabBar';
 import './index.scss';
 
@@ -20,6 +21,7 @@ export default function HallPage() {
   } = useFeedStore();
 
   const showToast = useAppStore((s) => s.showToast);
+  const [commentFeedId, setCommentFeedId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchFeed();
@@ -40,16 +42,16 @@ export default function HallPage() {
     showToast('收藏成功');
   };
 
-  const handleComment = (_id: string) => {
-    Taro.showToast({ title: '评论功能开发中', icon: 'none' });
+  const handleComment = (id: string) => {
+    setCommentFeedId(id);
   };
 
   const handleRankClick = () => {
-    showToast('排行榜开发中～');
+    Taro.navigateTo({ url: '/pages/sub-pages/rank/index' });
   };
 
   const handleSearchFocus = () => {
-    showToast('搜索功能开发中～');
+    Taro.navigateTo({ url: '/pages/sub-pages/search/index' });
   };
 
   return (
@@ -134,6 +136,12 @@ export default function HallPage() {
         {/* Bottom Safe Area */}
         <View className='feed-bottom-safe' />
       </ScrollView>
+
+      <CommentSheet
+        feedId={commentFeedId || ''}
+        visible={commentFeedId !== null}
+        onClose={() => setCommentFeedId(null)}
+      />
 
       <CustomTabBar />
     </View>

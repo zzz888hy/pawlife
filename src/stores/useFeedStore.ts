@@ -24,6 +24,7 @@ interface FeedState {
   addFeed: (data: CreateFeedData) => void;
   toggleLike: (feedId: string) => void;
   toggleCollect: (feedId: string) => void;
+  incrementCmts: (feedId: string) => void;
   setCategory: (cat: string) => void;
 }
 
@@ -85,6 +86,14 @@ export const useFeedStore = create<FeedState>((set) => ({
     set((s) => ({
       feedItems: s.feedItems.map((f) =>
         f.id === feedId ? { ...f, collected: !f.collected } : f
+      ),
+    }));
+  },
+
+  incrementCmts: (feedId: string) => {
+    set((s) => ({
+      feedItems: s.feedItems.map((f) =>
+        f.id === feedId ? { ...f, cmts: f.cmts + 1 } : f
       ),
     }));
   },
