@@ -1,22 +1,21 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, Textarea, Image } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useAppStore } from '@/stores/useAppStore';
 import { useFeedStore } from '@/stores/useFeedStore';
+import { usePetStore } from '@/stores/usePetStore';
+import { useUserStore } from '@/stores/useUserStore';
 import { chooseImage, uploadFile } from '@/services/cloud';
+import { addUserCoins } from '@/services/auth';
+import { isImageUrl } from '@/utils/format';
 import './index.scss';
-
-const PET_OPTIONS = [
-  { name: '豆豆', emoji: '🐕' },
-  { name: '橘子', emoji: '🐱' },
-];
 
 const TAG_OPTIONS = ['#金毛日常', '#猫咪日常', '#第一次', '#今日份快乐', '#最佳穿搭', '#饲养经验', '#宠物美食', '#健康记录'];
 
 export default function CreatePostPage() {
   const [text, setText] = useState('');
   const [images, setImages] = useState<string[]>([]);
-  const [selectedPet, setSelectedPet] = useState(PET_OPTIONS[0]);
+  const [selectedPetId, setSelectedPetId] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [publishing, setPublishing] = useState(false);
   const [aiCaption, setAiCaption] = useState('');
@@ -24,6 +23,16 @@ export default function CreatePostPage() {
 
   const showToast = useAppStore((s) => s.showToast);
   const addFeed = useFeedStore((s) => s.addFeed);
+  const addCoins = useUserStore((s) => s.addCoins);
+  const pets = usePetStore((s) => s.pets);
+  const fetchPets = usePetStore((s) => s.fetchPets);
+
+  useEffect(() => {
+    if (pets.length === 0) fetchPets();
+  }, []);
+
+  // 选中的宠物：优先按 id 找，找不到则回退到第一只
+  const selectedPet = pets.find((p) => p.id === selectedPetId) || pets[0];
 
   // 选择图片
   const handleChooseImage = async () => {
@@ -50,13 +59,14 @@ export default function CreatePostPage() {
     }
     setAiLoading(true);
     // Mock AI 配文生成
+    const petName = selectedPet?.name || '宝贝';
     setTimeout(() => {
       const captions = [
-        `${selectedPet.name}今天太可爱了！忍不住分享～🐾`,
-        `记录${selectedPet.name}的美好时光 ✨`,
-        `${selectedPet.name}的第${Math.floor(Math.random() * 1000)}天陪伴 💛`,
-        `今天又是被${selectedPet.name}治愈的一天 🥰`,
-        `${selectedPet.name}的小日常，每一刻都值得记录 📸`,
+        `${petName}今天太可爱了！忍不住分享～🐾`,
+        `记录${petName}的美好时光 ✨`,
+        `${petName}的第${Math.floor(Math.random() * 1000)}天陪伴 💛`,
+        `今天又是被${petName}治愈的一天 🥰`,
+        `${petName}的小日常，每一刻都值得记录 📸`,
       ];
       const caption = captions[Math.floor(Math.random() * captions.length)];
       setAiCaption(caption);
@@ -101,9 +111,9 @@ export default function CreatePostPage() {
 
       // 创建动态
       const feedData = {
-        petName: selectedPet.name,
-        petEmoji: selectedPet.emoji,
-        breed: selectedPet.name === '豆豆' ? '金毛·3岁' : '橘猫·2岁',
+        petName: selectedPet?.name || '宝贝',
+        petEmoji: selectedPet?.avatar || '🐾',
+        breed: selectedPet?.breed || '',
         text: text.trim() || (uploadedUrls.length > 0 ? '分享照片 📸' : ''),
         tags: selectedTags,
         images: uploadedUrls,
@@ -111,6 +121,8 @@ export default function CreatePostPage() {
       };
 
       addFeed(feedData);
+      addCoins(5);                 // 本地即时 +5
+      addUserCoins(5).catch(() => {});  // 后端持久化
       Taro.showToast({ title: '发布成功！+5 金币', icon: 'success' });
       setTimeout(() => Taro.navigateBack(), 1500);
     } catch (err) {
@@ -126,15 +138,24 @@ export default function CreatePostPage() {
       <View className='cp-section'>
         <Text className='cp-label'>选择宠物</Text>
         <View className='cp-pet-options'>
-          {PET_OPTIONS.map((pet) => (
-            <View
-              key={pet.name}
-              className={`cp-pet-btn ${selectedPet.name === pet.name ? 'active' : ''}`}
-              onClick={() => setSelectedPet(pet)}
-            >
-              <Text>{pet.emoji} {pet.name}</Text>
-            </View>
-          ))}
+          {pets.length > 0 ? (
+            pets.map((pet) => (
+              <View
+                key={pet.id}
+                className={`cp-pet-btn ${selectedPet?.id === pet.id ? 'active' : ''}`}
+                onClick={() => setSelectedPetId(pet.id)}
+              >
+                  {isImageUrl(pet.avatar) ? (
+                    <Image className='cp-pet-avatar' src={pet.avatar} mode='aspectFill' />
+                  ) : (
+                    <Text>{pet.avatar}</Text>
+                  )}
+                  <Text>{pet.name}</Text>
+              </View>
+            ))
+          ) : (
+            <Text className='cp-no-pet'>暂无宠物，请先创建</Text>
+          )}
         </View>
       </View>
 
@@ -150,7 +171,7 @@ export default function CreatePostPage() {
           className='cp-textarea'
           value={text}
           onInput={(e) => setText(e.detail.value)}
-          placeholder={`记录${selectedPet.name}的精彩瞬间...`}
+          placeholder={`记录${selectedPet?.name || '宝贝'}的精彩瞬间...`}
           placeholderClass='cp-placeholder'
           maxlength={500}
           autoHeight

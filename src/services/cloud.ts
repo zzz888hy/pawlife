@@ -92,3 +92,35 @@ export async function chooseImage(count = 1): Promise<string[]> {
     return [];
   }
 }
+
+/**
+ * 将临时图片路径转成 base64 data URL，用于本地预览
+ * 避免开发者工具里直接渲染 http 临时路径触发 CORS 报错
+ */
+export function toDataUrl(filePath: string): Promise<string> {
+  return new Promise((resolve) => {
+    if (!filePath || filePath.startsWith('cloud://') || filePath.startsWith('data:')) {
+      resolve(filePath);
+      return;
+    }
+    try {
+      const fs = Taro.getFileSystemManager();
+      fs.readFile({
+        filePath,
+        encoding: 'base64',
+        success: (res) => {
+          const ext = (filePath.split('?')[0].split('.').pop() || '').toLowerCase();
+          const mime =
+            ext === 'png' ? 'image/png'
+              : ext === 'gif' ? 'image/gif'
+              : ext === 'webp' ? 'image/webp'
+              : 'image/jpeg';
+          resolve(`data:${mime};base64,${res.data as string}`);
+        },
+        fail: () => resolve(filePath),
+      });
+    } catch {
+      resolve(filePath);
+    }
+  });
+}

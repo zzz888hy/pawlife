@@ -7,14 +7,36 @@ import {
   type CreateFeedData,
 } from '@/services/feed';
 
-const CATEGORIES = ['推荐', '最萌猫咪', '最帅狗狗', '最佳穿搭', '最搞笑', '饲养经验'];
+const SORT_TABS = ['推荐', '摸摸最多'];
+
+// 从动态里统计热门关键词（去掉 # 前缀），作为分类 tab
+export function deriveCategories(items: FeedItem[]): string[] {
+  const counts: Record<string, number> = {};
+  items.forEach((f) =>
+    (f.tags || []).forEach((t) => {
+      const key = t.replace(/^#/, '');
+      counts[key] = (counts[key] || 0) + 1;
+    })
+  );
+  const top = Object.entries(counts)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 6)
+    .map(([k]) => k);
+  return [...SORT_TABS, ...top];
+}
+
+// 根据当前分类排序 / 筛选动态
+export function applyCategory(items: FeedItem[], cat: string): FeedItem[] {
+  if (cat === '推荐') return items;
+  if (cat === '摸摸最多') return [...items].sort((a, b) => b.likes - a.likes);
+  return items.filter((f) => (f.tags || []).some((t) => t.replace(/^#/, '') === cat));
+}
 
 interface FeedState {
   feedItems: FeedItem[];
-  categories: string[];
   activeCategory: string;
   loading: boolean;
-  fetchFeed: (category?: string) => Promise<void>;
+  fetchFeed: () => Promise<void>;
   addFeed: (data: CreateFeedData) => Promise<void>;
   toggleLike: (feedId: string) => void;
   toggleCollect: (feedId: string) => void;
@@ -24,15 +46,14 @@ interface FeedState {
 
 export const useFeedStore = create<FeedState>((set) => ({
   feedItems: [],
-  categories: CATEGORIES,
   activeCategory: '推荐',
   loading: false,
 
-  fetchFeed: async (category) => {
+  fetchFeed: async () => {
     set({ loading: true });
     try {
       const items = await fetchFeedApi();
-      set({ feedItems: items, activeCategory: category || '推荐', loading: false });
+      set({ feedItems: items, loading: false });
     } catch {
       set({ loading: false });
     }

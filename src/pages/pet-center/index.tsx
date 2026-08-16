@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { View, Text, ScrollView } from '@tarojs/components';
+import { View, Text, ScrollView, Image } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { usePetStore } from '@/stores/usePetStore';
 import { useAppStore } from '@/stores/useAppStore';
+import { isImageUrl } from '@/utils/format';
 import TimelineItem from '@/components/TimelineItem';
 import SectionTitle from '@/components/SectionTitle';
 import CustomTabBar from '@/components/CustomTabBar';
@@ -38,7 +39,7 @@ export default function PetCenterPage() {
 
   const handleEditProfile = () => {
     if (currentPet) {
-      Taro.navigateTo({ url: `/pages/sub-pages/pet-identity/index?petId=${currentPet.id}` });
+      Taro.navigateTo({ url: `/pages/sub-pages/create-pet/index?petId=${currentPet.id}` });
     }
   };
 
@@ -93,7 +94,11 @@ export default function PetCenterPage() {
           <View className='pet-hero-content'>
             <View className='pet-hero-avatar-wrap'>
               <View className='pet-hero-avatar'>
-                <Text className='pet-hero-avatar-emoji'>{currentPet.avatar}</Text>
+                {isImageUrl(currentPet.avatar) ? (
+                  <Image className='pet-hero-avatar-img' src={currentPet.avatar} mode='aspectFill' />
+                ) : (
+                  <Text className='pet-hero-avatar-emoji'>{currentPet.avatar}</Text>
+                )}
               </View>
             </View>
             <View className='pet-hero-info'>
@@ -127,7 +132,11 @@ export default function PetCenterPage() {
                           : '#F0ECE6',
                     }}
                   >
-                    <Text className='pet-switch-avatar-emoji'>{pet.avatar}</Text>
+                    {isImageUrl(pet.avatar) ? (
+                      <Image className='pet-switch-avatar-img' src={pet.avatar} mode='aspectFill' />
+                    ) : (
+                      <Text className='pet-switch-avatar-emoji'>{pet.avatar}</Text>
+                    )}
                   </View>
                   <Text
                     className={`pet-switch-name ${currentPetId === pet.id ? 'active' : ''}`}

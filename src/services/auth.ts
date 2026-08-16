@@ -15,6 +15,7 @@ interface UserData {
   vipExpireDate: string | null;
   petCount: number;
   recordCount: number;
+  createdAt?: string;
   isNew?: boolean;
 }
 

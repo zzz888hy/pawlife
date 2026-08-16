@@ -1,5 +1,6 @@
 import { View, Text, Image } from '@tarojs/components';
 import type { FeedItem as FeedItemType } from '@/types';
+import { isImageUrl } from '@/utils/format';
 import './index.scss';
 
 interface FeedItemProps {
@@ -16,7 +17,11 @@ export default function FeedItem({ item, onLike, onCollect, onComment }: FeedIte
       {/* Header */}
       <View className='feed-head'>
         <View className='feed-avatar' style={{ background: item.bg }}>
-          <Text>{item.pet}</Text>
+          {isImageUrl(item.pet) ? (
+            <Image className='feed-avatar-img' src={item.pet} mode='aspectFill' />
+          ) : (
+            <Text>{item.pet}</Text>
+          )}
         </View>
         <View className='feed-info'>
           <Text className='feed-name'>
@@ -54,7 +59,11 @@ export default function FeedItem({ item, onLike, onCollect, onComment }: FeedIte
       ) : (
         <View className='feed-pics one'>
           <View className='feed-pic feed-pic--large' style={{ background: item.bg }}>
-            <Text>{item.pet}</Text>
+            {isImageUrl(item.pet) ? (
+              <Image className='feed-pic-img' src={item.pet} mode='aspectFill' />
+            ) : (
+              <Text>{item.pet}</Text>
+            )}
           </View>
         </View>
       )}

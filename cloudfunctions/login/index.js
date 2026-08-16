@@ -30,7 +30,8 @@ exports.main = async (event) => {
       updatedAt: now,
     };
     const addRes = await users.add({ data: newUser });
-    return { code: 0, data: { _id: addRes._id, ...newUser, isNew: true } };
+    // createdAt 返回干净的时间字符串（DB 里存 serverDate，响应用 ISO 字符串）
+    return { code: 0, data: { _id: addRes._id, ...newUser, createdAt: new Date().toISOString(), isNew: true } };
   }
 
   // 老用户：可更新昵称/头像

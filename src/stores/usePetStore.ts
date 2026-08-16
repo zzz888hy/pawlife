@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import type { Pet, TimelineEntry, CreatePetInput } from '@/types';
-import { fetchPetData, createPet as createPetApi } from '@/services/pet';
+import { fetchPetData, createPet as createPetApi, updatePet as updatePetApi } from '@/services/pet';
 
 interface PetState {
   pets: Pet[];
@@ -10,6 +10,7 @@ interface PetState {
   fetchPets: () => Promise<void>;
   switchPet: (petId: string) => void;
   createPet: (data: CreatePetInput) => Promise<void>;
+  updatePet: (petId: string, data: CreatePetInput) => Promise<void>;
   getCurrentPet: () => Pet | null;
 }
 
@@ -41,6 +42,15 @@ export const usePetStore = create<PetState>((set, get) => ({
   createPet: async (data: CreatePetInput) => {
     const newPet = await createPetApi(data);
     set((s) => ({ pets: [...s.pets, newPet], currentPetId: newPet.id }));
+  },
+
+  updatePet: async (petId: string, data: CreatePetInput) => {
+    const updated = await updatePetApi(petId, data);
+    set((s) => ({
+      pets: s.pets.map((p) =>
+        p.id === petId ? { ...p, ...updated, age: p.age, createdAt: p.createdAt } : p
+      ),
+    }));
   },
 
   getCurrentPet: () => {

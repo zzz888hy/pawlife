@@ -33,6 +33,7 @@ export interface CreatePetInput {
   gender: '♂ 男孩' | '♀ 女孩';
   personality: string;
   hobbies: string;
+  avatar?: string;   // emoji 或云存储 fileID
   photos: string[];
 }
 

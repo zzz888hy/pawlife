@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { View, Text, ScrollView, Input } from '@tarojs/components';
 import Taro from '@tarojs/taro';
-import { useFeedStore } from '@/stores/useFeedStore';
+import { useFeedStore, deriveCategories, applyCategory } from '@/stores/useFeedStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { useMessageStore } from '@/stores/useMessageStore';
 import FeedItem from '@/components/FeedItem';
@@ -12,7 +12,6 @@ import './index.scss';
 export default function HallPage() {
   const {
     feedItems,
-    categories,
     activeCategory,
     loading,
     fetchFeed,
@@ -29,9 +28,16 @@ export default function HallPage() {
     fetchFeed();
   }, []);
 
+  // 顶部分类 tab：推荐 + 摸摸最多 + 热门关键词（动态）
+  const categories = useMemo(() => deriveCategories(feedItems), [feedItems]);
+  // 按当前分类排序/筛选后的动态
+  const visibleItems = useMemo(
+    () => applyCategory(feedItems, activeCategory),
+    [feedItems, activeCategory],
+  );
+
   const handleCategoryTap = (cat: string) => {
     setCategory(cat);
-    fetchFeed(cat);
   };
 
   const handleLike = (id: string) => {
@@ -64,6 +70,10 @@ export default function HallPage() {
     Taro.navigateTo({ url: '/pages/sub-pages/messages/index' });
   };
 
+  const handleCameraClick = () => {
+    Taro.navigateTo({ url: '/pages/sub-pages/create-post/index' });
+  };
+
   return (
     <View className='hall-page'>
       {/* Sticky Header */}
@@ -79,7 +89,9 @@ export default function HallPage() {
                 </View>
               )}
             </View>
-            <Text className='hall-icon'>📷</Text>
+            <View className='hall-camera' onClick={handleCameraClick}>
+              <Text className='hall-icon'>📷</Text>
+            </View>
             <View className='hall-post-btn' onClick={handlePostClick}>
               <Text className='hall-post-plus'>＋</Text>
             </View>
@@ -136,13 +148,13 @@ export default function HallPage() {
           <View className='feed-loading'>
             <Text>加载中...</Text>
           </View>
-        ) : feedItems.length === 0 ? (
+        ) : visibleItems.length === 0 ? (
           <View className='feed-empty'>
             <Text className='feed-empty-icon'>📭</Text>
             <Text className='feed-empty-text'>还没有动态，快来发布第一条吧</Text>
           </View>
         ) : (
-          feedItems.map((item) => (
+          visibleItems.map((item) => (
             <FeedItem
               key={item.id}
               item={item}

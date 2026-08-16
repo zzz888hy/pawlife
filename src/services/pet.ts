@@ -59,11 +59,12 @@ export async function fetchPetData(): Promise<{ pets: Pet[]; timeline: TimelineE
 }
 
 export async function createPet(data: CreatePetInput): Promise<Pet> {
+  const avatar = data.avatar || TYPE_EMOJI[data.type] || '🐾';
   if (MOCK_ENABLED) {
     return {
       id: generateId(),
       ...data,
-      avatar: TYPE_EMOJI[data.type] || '🐾',
+      avatar,
       age: 0,
       createdAt: new Date().toISOString(),
     };
@@ -71,7 +72,20 @@ export async function createPet(data: CreatePetInput): Promise<Pet> {
 
   const raw = await callCloudFunction<RawPet>('pet', {
     action: 'create',
-    data: { ...data, avatar: TYPE_EMOJI[data.type] || '🐾', age: 0 },
+    data: { ...data, avatar, age: 0 },
+  });
+  return toPet(raw);
+}
+
+export async function updatePet(id: string, data: CreatePetInput): Promise<Pet> {
+  const avatar = data.avatar || TYPE_EMOJI[data.type] || '🐾';
+  if (MOCK_ENABLED) {
+    return { id, ...data, avatar, age: 0, createdAt: new Date().toISOString() };
+  }
+
+  const raw = await callCloudFunction<RawPet>('pet', {
+    action: 'update',
+    data: { _id: id, ...data, avatar },
   });
   return toPet(raw);
 }

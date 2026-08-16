@@ -157,6 +157,48 @@
   color: #666;
 }
 
+// ===== Avatar Selector =====
+.cp-avatar-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.cp-avatar-item {
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 50%;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid transparent;
+  overflow: hidden;
+  transition: all 0.2s;
+
+  &.selected {
+    border-color: #ff9a56;
+    background: #fff8f5;
+  }
+}
+
+.cp-avatar-emoji {
+  font-size: 44rpx;
+}
+
+.cp-avatar-photo {
+  background: #faf7f4;
+}
+
+.cp-avatar-camera {
+  font-size: 36rpx;
+}
+
+.cp-avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
 // ===== Gender Selector =====
 .cp-gender-row {
   display: flex;

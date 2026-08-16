@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View, Text, Input, ScrollView, Image } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useRouter } from '@tarojs/taro';
 import { usePetStore } from '@/stores/usePetStore';
 import { useAppStore } from '@/stores/useAppStore';
-import { chooseImage } from '@/services/cloud';
+import { chooseImage, uploadFile, toDataUrl } from '@/services/cloud';
+import { isImageUrl } from '@/utils/format';
 import SubPageHeader from '@/components/SubPageHeader';
 import type { PetType } from '@/types';
 import './index.scss';
@@ -15,6 +16,9 @@ const PET_TYPES: { type: PetType; emoji: string; label: string }[] = [
   { type: '其他', emoji: '🐾', label: '其他' },
 ];
 
+// 可选卡通头像
+const AVATAR_EMOJIS = ['🐕', '🐶', '🐱', '🐈', '🐰', '🐇', '🐹', '🐢', '🐦', '🦜', '🐠', '🐾'];
+
 interface FormData {
   name: string;
   type: PetType;
@@ -23,6 +27,7 @@ interface FormData {
   gender: '♂ 男孩' | '♀ 女孩';
   personality: string;
   hobbies: string;
+  avatar: string;   // emoji 或图片路径（空 = 按类型默认）
   photoSlots: string[];
 }
 
@@ -34,14 +39,49 @@ const INITIAL_FORM: FormData = {
   gender: '♂ 男孩',
   personality: '',
   hobbies: '',
+  avatar: '',
   photoSlots: ['', '', '', '', '', ''],
 };
 
 export default function CreatePetPage() {
+  const router = useRouter();
+  const editId = (router.params?.petId as string) || '';
+  const isEdit = !!editId;
+
+  const pets = usePetStore((s) => s.pets);
+  const createPet = usePetStore((s) => s.createPet);
+  const updatePet = usePetStore((s) => s.updatePet);
+  const fetchPets = usePetStore((s) => s.fetchPets);
+  const showToast = useAppStore((s) => s.showToast);
+
+  const editingPet = isEdit ? pets.find((p) => p.id === editId) : undefined;
+
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState<FormData>(INITIAL_FORM);
-  const createPet = usePetStore((s) => s.createPet);
-  const showToast = useAppStore((s) => s.showToast);
+  const prefillDone = useRef(false);
+  const [avatarPreview, setAvatarPreview] = useState('');       // 拍照头像的 base64 预览
+  const [photoPreviews, setPhotoPreviews] = useState<Record<number, string>>({});
+
+  // 编辑模式：用宠物信息回填表单（若尚未加载则先拉取）
+  useEffect(() => {
+    if (!isEdit || prefillDone.current) return;
+    if (editingPet) {
+      setFormData({
+        name: editingPet.name,
+        type: editingPet.type,
+        breed: editingPet.breed,
+        birthday: editingPet.birthday,
+        gender: editingPet.gender,
+        personality: editingPet.personality,
+        hobbies: editingPet.hobbies,
+        avatar: editingPet.avatar || '',
+        photoSlots: [...(editingPet.photos || []), '', '', '', '', '', ''].slice(0, 6),
+      });
+      prefillDone.current = true;
+    } else {
+      fetchPets();
+    }
+  }, [isEdit, editingPet, fetchPets]);
 
   const updateField = <K extends keyof FormData>(key: K, value: FormData[K]) => {
     setFormData((prev) => ({ ...prev, [key]: value }));
@@ -53,14 +93,32 @@ export default function CreatePetPage() {
       const newSlots = [...formData.photoSlots];
       newSlots[index] = '';
       updateField('photoSlots', newSlots);
+      setPhotoPreviews((prev) => {
+        const next = { ...prev };
+        delete next[index];
+        return next;
+      });
       return;
     }
     // Choose real photo from camera/album
     const paths = await chooseImage(1);
     if (paths.length > 0) {
+      const fp = paths[0];
       const newSlots = [...formData.photoSlots];
-      newSlots[index] = paths[0];
+      newSlots[index] = fp;
       updateField('photoSlots', newSlots);
+      const preview = await toDataUrl(fp);
+      setPhotoPreviews((prev) => ({ ...prev, [index]: preview }));
+    }
+  };
+
+  // 头像：拍照/相册上传
+  const handleAvatarPhoto = async () => {
+    const paths = await chooseImage(1);
+    if (paths.length > 0) {
+      const fp = paths[0];
+      updateField('avatar', fp);
+      setAvatarPreview(await toDataUrl(fp));
     }
   };
 
@@ -92,9 +150,37 @@ export default function CreatePetPage() {
     }
   };
 
-  const handleFinish = () => {
-    const photos = formData.photoSlots.filter(Boolean);
-    createPet({
+  const handleFinish = async () => {
+    const rawPhotos = formData.photoSlots.filter(Boolean);
+    const typeEmoji = PET_TYPES.find((t) => t.type === formData.type)?.emoji || '🐾';
+    let avatar = formData.avatar;
+    if (!avatar) {
+      avatar = typeEmoji; // 未选头像：按宠物类型默认
+    } else if (isImageUrl(avatar) && !avatar.startsWith('cloud://')) {
+      // 新上传的拍照头像：上传到云存储（已是 fileID 的跳过）
+      try {
+        avatar = await uploadFile(avatar, `avatars/${Date.now()}.jpg`);
+      } catch {
+        avatar = typeEmoji; // 上传失败回退到类型默认
+      }
+    }
+
+    // 宠物照片：上传到云存储（已是 cloud:// 的跳过）
+    const photos: string[] = [];
+    for (let i = 0; i < rawPhotos.length; i++) {
+      const p = rawPhotos[i];
+      if (isImageUrl(p) && !p.startsWith('cloud://')) {
+        try {
+          photos.push(await uploadFile(p, `pets/${Date.now()}_${i}.jpg`));
+        } catch {
+          // 单张上传失败则跳过
+        }
+      } else {
+        photos.push(p);
+      }
+    }
+
+    const payload = {
       name: formData.name,
       type: formData.type,
       breed: formData.breed,
@@ -102,9 +188,17 @@ export default function CreatePetPage() {
       gender: formData.gender,
       personality: formData.personality,
       hobbies: formData.hobbies,
+      avatar,
       photos,
-    });
-    showToast('🎉 宠物创建成功！');
+    };
+
+    if (isEdit) {
+      await updatePet(editId, payload);
+      showToast('✅ 宠物信息已更新');
+    } else {
+      await createPet(payload);
+      showToast('🎉 宠物创建成功！');
+    }
     setTimeout(() => {
       Taro.navigateBack();
     }, 600);
@@ -114,7 +208,7 @@ export default function CreatePetPage() {
 
   return (
     <View className='create-pet-page'>
-      <SubPageHeader title='创建宠物' />
+      <SubPageHeader title={isEdit ? '编辑宠物' : '创建宠物'} />
 
       {/* Progress Bar */}
       <View className='cp-progress-wrap'>
@@ -166,6 +260,32 @@ export default function CreatePetPage() {
                     <Text className='cp-type-label'>{item.label}</Text>
                   </View>
                 ))}
+              </View>
+            </View>
+
+            <View className='cp-form-group'>
+              <Text className='cp-label'>宠物头像</Text>
+              <Text className='cp-hint'>可选卡通头像，或拍照上传</Text>
+              <View className='cp-avatar-grid'>
+                {AVATAR_EMOJIS.map((emoji) => (
+                  <View
+                    key={emoji}
+                    className={`cp-avatar-item ${formData.avatar === emoji ? 'selected' : ''}`}
+                    onClick={() => { updateField('avatar', emoji); setAvatarPreview(''); }}
+                  >
+                    <Text className='cp-avatar-emoji'>{emoji}</Text>
+                  </View>
+                ))}
+                <View
+                  className={`cp-avatar-item cp-avatar-photo ${isImageUrl(formData.avatar) ? 'selected' : ''}`}
+                  onClick={handleAvatarPhoto}
+                >
+                  {isImageUrl(formData.avatar) ? (
+                    <Image className='cp-avatar-img' src={avatarPreview || formData.avatar} mode='aspectFill' />
+                  ) : (
+                    <Text className='cp-avatar-camera'>📷</Text>
+                  )}
+                </View>
               </View>
             </View>
 
@@ -268,7 +388,7 @@ export default function CreatePetPage() {
                     onClick={() => handlePhotoTap(i)}
                   >
                     {photo ? (
-                      <Image className='cp-photo-img' src={photo} mode='aspectFill' />
+                      <Image className='cp-photo-img' src={photoPreviews[i] || photo} mode='aspectFill' />
                     ) : (
                       <Text className='cp-photo-plus'>+</Text>
                     )}
@@ -292,7 +412,7 @@ export default function CreatePetPage() {
                 <Text>上一步</Text>
               </View>
               <View className='cp-btn cp-btn-primary' onClick={handleFinish}>
-                <Text>✨ 创建完成</Text>
+                <Text>{isEdit ? '保存修改' : '✨ 创建完成'}</Text>
               </View>
             </View>
           </View>

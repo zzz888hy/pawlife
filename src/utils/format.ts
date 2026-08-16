@@ -49,3 +49,11 @@ export function calcDays(from: string): number {
 export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 9);
 }
+
+/**
+ * 判断头像是否为图片（云存储 fileID / 临时路径 / url），否则视为 emoji
+ */
+export function isImageUrl(v?: string): boolean {
+  if (!v) return false;
+  return /^(cloud:\/\/|https?:\/\/|wxfile:\/\/|data:)/.test(v);
+}

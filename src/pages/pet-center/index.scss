@@ -102,6 +102,12 @@
   font-size: 90rpx;
 }
 
+.pet-hero-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+}
+
 .pet-hero-info {
   text-align: center;
   margin-bottom: 24rpx;
@@ -171,6 +177,12 @@
 
 .pet-switch-avatar-emoji {
   font-size: 48rpx;
+}
+
+.pet-switch-avatar-img {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 }
 
 .pet-switch-name {
