@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useMarketStore } from '@/stores/useMarketStore';
-import { useAppStore } from '@/stores/useAppStore';
 import ProductCard from '@/components/ProductCard';
 import SectionTitle from '@/components/SectionTitle';
 import CustomTabBar from '@/components/CustomTabBar';
@@ -19,7 +18,6 @@ const MARKET_CATEGORIES = [
 
 export default function MarketplacePage() {
   const { products, fetchProducts } = useMarketStore();
-  const { isLoggedIn } = useAppStore();
   const [activeCategory, setActiveCategory] = useState('用品');
 
   useEffect(() => {
@@ -45,10 +43,7 @@ export default function MarketplacePage() {
   return (
     <View className="marketplace-page">
       {/* Section Title */}
-      <SectionTitle
-        title="🐾 宠物生活馆"
-        moreText="社区种草·商城变现"
-      />
+      <SectionTitle title="🐾 宠物生活馆" />
 
       {/* Market Banner */}
       <View className="market-banner">

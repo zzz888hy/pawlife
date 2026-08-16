@@ -1,15 +1,19 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import SubPageHeader from '@/components/SubPageHeader';
 import { useAppStore } from '@/stores/useAppStore';
-import { mockMemorialPets } from '@/services/mock/memorial.mock';
+import { fetchMemorials } from '@/services/memorial';
 import type { MemorialPet } from '@/types';
 import './index.scss';
 
 export default function MemorialHallPage() {
   const { showToast } = useAppStore();
-  const [pets] = useState<MemorialPet[]>(mockMemorialPets);
+  const [pets, setPets] = useState<MemorialPet[]>([]);
+
+  useEffect(() => {
+    fetchMemorials().then(setPets).catch(() => {});
+  }, []);
 
   const handleServicePurchase = () => {
     showToast('功能开发中，敬请期待');

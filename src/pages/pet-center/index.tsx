@@ -46,6 +46,10 @@ export default function PetCenterPage() {
     Taro.navigateTo({ url: item.url });
   };
 
+  const handleViewAllTimeline = () => {
+    Taro.navigateTo({ url: '/pages/sub-pages/timeline/index' });
+  };
+
   if (loading && pets.length === 0) {
     return (
       <View className='pet-center-page'>
@@ -71,6 +75,8 @@ export default function PetCenterPage() {
       </View>
     );
   }
+
+  const currentTimeline = timeline.filter((t) => t.petId === currentPet.id).slice(0, 3);
 
   return (
     <View className='pet-center-page'>
@@ -183,13 +189,13 @@ export default function PetCenterPage() {
 
         {/* Timeline Section */}
         <View className='timeline-section'>
-          <SectionTitle title='成长时间轴' more='查看全部' onMore={() => showToast('全部时间轴开发中～')} />
+          <SectionTitle title='成长时间轴' more='查看全部' onMore={handleViewAllTimeline} />
           <View className='timeline-list'>
-            {timeline.map((entry, idx) => (
+            {currentTimeline.map((entry, idx) => (
               <TimelineItem
                 key={entry.id}
                 item={entry}
-                isLast={idx === timeline.length - 1}
+                isLast={idx === currentTimeline.length - 1}
               />
             ))}
           </View>

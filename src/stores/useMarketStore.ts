@@ -1,7 +1,18 @@
 import { create } from 'zustand';
 import type { Product, MarketCategory, CartItem, Order, OrderItem, OrderStatus } from '@/types';
-import { mockProducts, mockMarketCategories } from '@/services/mock/market.mock';
+import { mockMarketCategories } from '@/services/mock/market.mock';
 import { generateId } from '@/utils/format';
+import {
+  fetchProducts as fetchProductsApi,
+  createProduct as createProductApi,
+  addToCart as addToCartApi,
+  removeFromCart as removeFromCartApi,
+  clearCart as clearCartApi,
+  fetchCart as fetchCartApi,
+  placeOrder as placeOrderApi,
+  fetchOrders as fetchOrdersApi,
+  updateOrderStatus as updateOrderStatusApi,
+} from '@/services/market';
 
 interface MarketState {
   products: Product[];
@@ -10,14 +21,16 @@ interface MarketState {
   cart: CartItem[];
   orders: Order[];
   loading: boolean;
-  fetchProducts: (category?: string) => void;
+  fetchProducts: (category?: string) => Promise<void>;
+  fetchCart: () => Promise<void>;
+  fetchOrders: () => Promise<void>;
   setCategory: (cat: string) => void;
   addToCart: (productId: string) => void;
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
   getProductById: (id: string) => Product | undefined;
   addProduct: (data: Omit<Product, 'id' | 'sold'>) => Product;
-  placeOrder: (items: OrderItem[], totalPrice: number) => Order;
+  placeOrder: (items: OrderItem[], totalPrice: number) => Promise<Order>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
 }
 
@@ -29,21 +42,37 @@ export const useMarketStore = create<MarketState>((set, get) => ({
   orders: [],
   loading: false,
 
-  fetchProducts: (category?: string) => {
+  fetchProducts: async (category) => {
     set({ loading: true });
-    const cat = category || '用品';
-    setTimeout(() => {
-      set({
-        products: mockProducts,
-        activeCategory: cat,
-        loading: false,
-      });
-    }, 200);
+    try {
+      const products = await fetchProductsApi(category);
+      set({ products, activeCategory: category || '用品', loading: false });
+    } catch {
+      set({ loading: false });
+    }
   },
 
-  setCategory: (cat: string) => set({ activeCategory: cat }),
+  fetchCart: async () => {
+    try {
+      const cart = await fetchCartApi();
+      set({ cart });
+    } catch {
+      /* ignore */
+    }
+  },
 
-  addToCart: (productId: string) => {
+  fetchOrders: async () => {
+    try {
+      const orders = await fetchOrdersApi();
+      set({ orders });
+    } catch {
+      /* ignore */
+    }
+  },
+
+  setCategory: (cat) => set({ activeCategory: cat }),
+
+  addToCart: (productId) => {
     set((s) => {
       const existing = s.cart.find((c) => c.productId === productId);
       if (existing) {
@@ -55,46 +84,42 @@ export const useMarketStore = create<MarketState>((set, get) => ({
       }
       return { cart: [...s.cart, { productId, quantity: 1 }] };
     });
+    addToCartApi(productId).catch(() => {});
   },
 
-  removeFromCart: (productId: string) => {
-    set((s) => ({
-      cart: s.cart.filter((c) => c.productId !== productId),
-    }));
+  removeFromCart: (productId) => {
+    set((s) => ({ cart: s.cart.filter((c) => c.productId !== productId) }));
+    removeFromCartApi(productId).catch(() => {});
   },
 
-  clearCart: () => set({ cart: [] }),
-
-  getProductById: (id: string) => {
-    return get().products.find((p) => p.id === id);
+  clearCart: () => {
+    set({ cart: [] });
+    clearCartApi().catch(() => {});
   },
 
-  addProduct: (data: Omit<Product, 'id' | 'sold'>) => {
+  getProductById: (id) => get().products.find((p) => p.id === id),
+
+  addProduct: (data) => {
     const product: Product = {
       ...data,
       id: generateId(),
       sold: '0',
     };
     set((s) => ({ products: [product, ...s.products] }));
+    createProductApi(data).catch(() => {});
     return product;
   },
 
-  placeOrder: (items: OrderItem[], totalPrice: number) => {
-    const order: Order = {
-      id: generateId(),
-      orderNo: `PL${Date.now()}`,
-      items,
-      totalPrice: Math.round(totalPrice * 10) / 10,
-      status: 'pending',
-      createdAt: new Date().toISOString(),
-    };
+  placeOrder: async (items, totalPrice) => {
+    const order = await placeOrderApi(items, totalPrice);
     set((s) => ({ orders: [order, ...s.orders] }));
     return order;
   },
 
-  updateOrderStatus: (orderId: string, status: OrderStatus) => {
+  updateOrderStatus: (orderId, status) => {
     set((s) => ({
       orders: s.orders.map((o) => (o.id === orderId ? { ...o, status } : o)),
     }));
+    updateOrderStatusApi(orderId, status).catch(() => {});
   },
 }));

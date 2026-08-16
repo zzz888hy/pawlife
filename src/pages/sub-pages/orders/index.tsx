@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import SubPageHeader from '@/components/SubPageHeader';
@@ -33,8 +33,13 @@ function formatTime(iso: string): string {
 export default function OrdersPage() {
   const orders = useMarketStore((s) => s.orders);
   const updateOrderStatus = useMarketStore((s) => s.updateOrderStatus);
+  const fetchOrders = useMarketStore((s) => s.fetchOrders);
   const showToast = useAppStore((s) => s.showToast);
   const [activeTab, setActiveTab] = useState<'all' | OrderStatus>('all');
+
+  useEffect(() => {
+    fetchOrders();
+  }, []);
 
   const filteredOrders = activeTab === 'all'
     ? orders

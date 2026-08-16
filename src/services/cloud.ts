@@ -49,7 +49,7 @@ export async function callCloudFunction<T = unknown>(
 export function initCloud() {
   if (Taro.cloud && !MOCK_ENABLED) {
     Taro.cloud.init({
-      env: 'your-env-id', // 替换为你的云开发环境 ID
+      env: 'cloud1-d0g65xdsg79dc9e22',
       traceUser: true,
     });
   }
@@ -80,11 +80,6 @@ export async function uploadFile(filePath: string, cloudPath: string): Promise<s
  * 选择图片
  */
 export async function chooseImage(count = 1): Promise<string[]> {
-  if (MOCK_ENABLED) {
-    // Mock 模式下返回空数组
-    return [];
-  }
-
   try {
     const res = await Taro.chooseImage({
       count,

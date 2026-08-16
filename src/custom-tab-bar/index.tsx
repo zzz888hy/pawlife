@@ -6,8 +6,8 @@ import './index.scss';
 const TABS = [
   { key: 'hall', icon: '🏠', label: '大厅', path: '/pages/hall/index' },
   { key: 'pet-center', icon: '🐾', label: '宠物馆', path: '/pages/pet-center/index' },
-  { key: 'post-modal', icon: '', label: '', path: '/pages/post-modal/index', isPost: true },
   { key: 'marketplace', icon: '🛍️', label: '集市', path: '/pages/marketplace/index' },
+  { key: 'friends', icon: '🤝', label: '宠友广场', path: '/pages/friends/index' },
   { key: 'profile', icon: '👤', label: '我的', path: '/pages/profile/index' },
 ];
 
@@ -36,31 +36,16 @@ export default function CustomTabBar() {
 
   return (
     <View className='custom-tabbar'>
-      {TABS.map((tab) => {
-        if (tab.isPost) {
-          return (
-            <View
-              key={tab.key}
-              className='tab-item tab-post'
-              onClick={() => handleTabClick(tab)}
-            >
-              <View className='post-btn'>
-                <Text>+</Text>
-              </View>
-            </View>
-          );
-        }
-        return (
-          <View
-            key={tab.key}
-            className={`tab-item ${activeKey === tab.key ? 'active' : ''}`}
-            onClick={() => handleTabClick(tab)}
-          >
-            <Text className='tab-icon'>{tab.icon}</Text>
-            <Text className='tab-label'>{tab.label}</Text>
-          </View>
-        );
-      })}
+      {TABS.map((tab) => (
+        <View
+          key={tab.key}
+          className={`tab-item ${activeKey === tab.key ? 'active' : ''}`}
+          onClick={() => handleTabClick(tab)}
+        >
+          <Text className='tab-icon'>{tab.icon}</Text>
+          <Text className='tab-label'>{tab.label}</Text>
+        </View>
+      ))}
     </View>
   );
 }

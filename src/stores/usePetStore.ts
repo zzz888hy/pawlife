@@ -1,16 +1,15 @@
 import { create } from 'zustand';
 import type { Pet, TimelineEntry, CreatePetInput } from '@/types';
-import { mockPets, mockTimeline } from '@/services/mock/pet.mock';
-import { generateId } from '@/utils/format';
+import { fetchPetData, createPet as createPetApi } from '@/services/pet';
 
 interface PetState {
   pets: Pet[];
   currentPetId: string | null;
   timeline: TimelineEntry[];
   loading: boolean;
-  fetchPets: () => void;
+  fetchPets: () => Promise<void>;
   switchPet: (petId: string) => void;
-  createPet: (data: CreatePetInput) => void;
+  createPet: (data: CreatePetInput) => Promise<void>;
   getCurrentPet: () => Pet | null;
 }
 
@@ -20,31 +19,27 @@ export const usePetStore = create<PetState>((set, get) => ({
   timeline: [],
   loading: false,
 
-  fetchPets: () => {
+  fetchPets: async () => {
     set({ loading: true });
-    // Simulate async
-    setTimeout(() => {
+    try {
+      const { pets, timeline } = await fetchPetData();
       set({
-        pets: mockPets,
-        currentPetId: mockPets[0]?.id || null,
-        timeline: mockTimeline,
+        pets,
+        currentPetId: pets[0]?.id || null,
+        timeline,
         loading: false,
       });
-    }, 200);
+    } catch {
+      set({ loading: false });
+    }
   },
 
   switchPet: (petId: string) => {
     set({ currentPetId: petId });
   },
 
-  createPet: (data: CreatePetInput) => {
-    const newPet: Pet = {
-      id: generateId(),
-      ...data,
-      avatar: data.photos[0] || '🐾',
-      age: 0,
-      createdAt: new Date().toISOString(),
-    };
+  createPet: async (data: CreatePetInput) => {
+    const newPet = await createPetApi(data);
     set((s) => ({ pets: [...s.pets, newPet], currentPetId: newPet.id }));
   },
 

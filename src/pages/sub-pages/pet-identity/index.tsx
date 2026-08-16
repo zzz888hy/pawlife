@@ -19,6 +19,7 @@ export default function PetIdentityPage() {
   const fetchPets = usePetStore((s) => s.fetchPets);
   const records = useIdentityStore((s) => s.records);
   const applyIdentity = useIdentityStore((s) => s.applyIdentity);
+  const fetchRecords = useIdentityStore((s) => s.fetchRecords);
   const showToast = useAppStore((s) => s.showToast);
 
   const [selectedPetId, setSelectedPetId] = useState('');
@@ -28,6 +29,7 @@ export default function PetIdentityPage() {
 
   useEffect(() => {
     fetchPets();
+    fetchRecords();
   }, []);
 
   const selectedPet = pets.find((p) => p.id === selectedPetId) || pets[0];

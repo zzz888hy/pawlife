@@ -13,15 +13,21 @@ type SubPageName =
   | 'settings'
   | 'pet-identity'
   | 'rank'
-  | 'search';
+  | 'search'
+  | 'timeline'
+  | 'help'
+  | 'about'
+  | 'album'
+  | 'chat'
+  | 'messages';
 
-type TabName = 'hall' | 'pet-center' | 'post-modal' | 'marketplace' | 'profile';
+type TabName = 'hall' | 'pet-center' | 'marketplace' | 'friends' | 'profile';
 
 const TAB_PATHS: Record<TabName, string> = {
   'hall': '/pages/hall/index',
   'pet-center': '/pages/pet-center/index',
-  'post-modal': '/pages/post-modal/index',
   'marketplace': '/pages/marketplace/index',
+  'friends': '/pages/friends/index',
   'profile': '/pages/profile/index',
 };
 

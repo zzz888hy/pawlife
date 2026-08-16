@@ -1,100 +1,93 @@
+/**
+ * 云函数：order
+ * 购物车 / 订单
+ */
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
+
 const db = cloud.database();
+const _ = db.command;
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
-  const { action, data, orderId, productId } = event;
-
+  const { action, data } = event || {};
   if (!OPENID) return { code: -1, message: '未登录' };
+
+  const cart = db.collection('cart');
+  const orders = db.collection('orders');
+  const products = db.collection('products');
 
   try {
     switch (action) {
-      case 'cartAdd':
-        return await addToCart(OPENID, productId, data?.quantity || 1);
-      case 'cartList':
-        return await getCart(OPENID);
-      case 'cartRemove':
-        return await removeFromCart(OPENID, productId);
-      case 'create':
-        return await createOrder(OPENID, data);
-      case 'list':
-        return await listOrders(OPENID);
-      case 'detail':
-        return await getOrder(orderId, OPENID);
+      case 'cartAdd': {
+        const productId = data.productId;
+        const quantity = data.quantity || 1;
+        const exist = await cart.where({ openid: OPENID, productId }).get();
+        if (exist.data.length > 0) {
+          await cart.doc(exist.data[0]._id).update({
+            data: { quantity: exist.data[0].quantity + quantity },
+          });
+        } else {
+          await cart.add({ data: { openid: OPENID, productId, quantity, createdAt: db.serverDate() } });
+        }
+        return { code: 0, data: { ok: true } };
+      }
+
+      case 'cartList': {
+        const res = await cart.where({ openid: OPENID }).get();
+        return { code: 0, data: res.data };
+      }
+
+      case 'cartRemove': {
+        await cart.where({ openid: OPENID, productId: data.productId }).remove();
+        return { code: 0, data: { ok: true } };
+      }
+
+      case 'cartClear': {
+        await cart.where({ openid: OPENID }).remove();
+        return { code: 0, data: { ok: true } };
+      }
+
+      case 'create': {
+        const orderNo = 'PL' + Date.now();
+        const createdAt = new Date();
+        const order = {
+          openid: OPENID,
+          orderNo,
+          items: data.items,
+          totalPrice: data.totalPrice,
+          status: 'pending',
+          createdAt,
+        };
+        const res = await orders.add({ data: order });
+
+        const productIds = (data.items || []).map((i) => i.productId);
+        if (productIds.length) {
+          await cart.where({ openid: OPENID, productId: _.in(productIds) }).remove();
+          for (const item of data.items) {
+            await products.doc(item.productId).update({ data: { soldCount: _.inc(item.quantity) } });
+          }
+        }
+        return {
+          code: 0,
+          data: { _id: res._id, orderNo, items: data.items, totalPrice: data.totalPrice, status: 'pending', createdAt },
+        };
+      }
+
+      case 'list': {
+        const res = await orders.where({ openid: OPENID }).orderBy('createdAt', 'desc').limit(100).get();
+        return { code: 0, data: res.data };
+      }
+
+      case 'updateStatus': {
+        await orders.where({ _id: data.orderId, openid: OPENID }).update({ data: { status: data.status } });
+        return { code: 0, data: { ok: true } };
+      }
+
       default:
-        return { code: -1, message: '未知操作' };
+        return { code: 400, message: '未知操作' };
     }
   } catch (err) {
     return { code: -1, message: err.message };
   }
 };
-
-async function addToCart(openid, productId, quantity) {
-  // 检查是否已在购物车
-  const exist = await db.collection('cart').where({ openid, productId }).get();
-  if (exist.data.length > 0) {
-    await db.collection('cart').doc(exist.data[0]._id).update({
-      data: { quantity: exist.data[0].quantity + quantity },
-    });
-  } else {
-    await db.collection('cart').add({
-      data: { openid, productId, quantity, createdAt: db.serverDate() },
-    });
-  }
-  return { code: 0, message: '已加入购物车' };
-}
-
-async function getCart(openid) {
-  const res = await db.collection('cart').where({ openid }).get();
-  // 关联商品详情
-  const items = [];
-  for (const item of res.data) {
-    const product = await db.collection('products').doc(item.productId).get();
-    if (product.data) {
-      items.push({ ...item, product: product.data });
-    }
-  }
-  return { code: 0, data: items };
-}
-
-async function removeFromCart(openid, productId) {
-  await db.collection('cart').where({ openid, productId }).remove();
-  return { code: 0, message: '已移除' };
-}
-
-async function createOrder(openid, data) {
-  const order = {
-    openid,
-    items: data.items,
-    totalPrice: data.totalPrice,
-    status: 'pending',
-    address: data.address || {},
-    createdAt: db.serverDate(),
-  };
-  const res = await db.collection('orders').add({ data: order });
-
-  // 清空购物车中已下单的商品
-  const productIds = data.items.map((i) => i.productId);
-  await db.collection('cart').where({ openid, productId: db.command.in(productIds) }).remove();
-
-  // 更新商品销量
-  for (const item of data.items) {
-    await db.collection('products').doc(item.productId).update({
-      data: { soldCount: db.command.inc(item.quantity) },
-    });
-  }
-
-  return { code: 0, data: { ...order, _id: res._id } };
-}
-
-async function listOrders(openid) {
-  const res = await db.collection('orders').where({ openid }).orderBy('createdAt', 'desc').get();
-  return { code: 0, data: res.data };
-}
-
-async function getOrder(orderId, openid) {
-  const res = await db.collection('orders').where({ _id: orderId, openid }).get();
-  if (res.data.length === 0) return { code: -1, message: '订单不存在' };
-  return { code: 0, data: res.data[0] };
-}

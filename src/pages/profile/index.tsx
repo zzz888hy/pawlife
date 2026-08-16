@@ -7,6 +7,7 @@ import CustomTabBar from '@/components/CustomTabBar';
 import './index.scss';
 
 const MENU_SECTION_1 = [
+  { key: 'messages', label: '消息中心', icon: '🔔', url: '/pages/sub-pages/messages/index' },
   { key: 'vip', label: 'Pro会员', icon: '👑', url: '/pages/sub-pages/vip-membership/index' },
   { key: 'orders', label: '我的订单', icon: '📦', url: '/pages/sub-pages/orders/index' },
   { key: 'coins', label: '宠物金币', icon: '💰', url: '/pages/sub-pages/wallet/index' },
@@ -16,8 +17,8 @@ const MENU_SECTION_1 = [
 
 const MENU_SECTION_2 = [
   { key: 'settings', label: '设置', icon: '⚙️', url: '/pages/sub-pages/settings/index' },
-  { key: 'help', label: '帮助与反馈', icon: '💬', url: '' },
-  { key: 'about', label: '关于PawLife', icon: 'ℹ️', url: '' },
+  { key: 'help', label: '帮助与反馈', icon: '💬', url: '/pages/sub-pages/help/index' },
+  { key: 'about', label: '关于PawLife', icon: 'ℹ️', url: '/pages/sub-pages/about/index' },
 ];
 
 export default function ProfilePage() {

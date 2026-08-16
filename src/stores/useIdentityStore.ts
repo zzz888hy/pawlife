@@ -1,25 +1,30 @@
 import { create } from 'zustand';
 import type { PetIdentity } from '@/types';
-import { generateId } from '@/utils/format';
+import {
+  fetchRecords as fetchRecordsApi,
+  applyIdentity as applyIdentityApi,
+} from '@/services/identity';
 
 interface IdentityState {
   records: PetIdentity[];
-  applyIdentity: (data: Omit<PetIdentity, 'id' | 'status' | 'submittedAt'>) => PetIdentity;
+  fetchRecords: () => Promise<void>;
+  applyIdentity: (data: Omit<PetIdentity, 'id' | 'status' | 'submittedAt'>) => Promise<void>;
   getByIdentityPetId: (petId: string) => PetIdentity | undefined;
 }
 
 export const useIdentityStore = create<IdentityState>((set, get) => ({
   records: [],
 
-  applyIdentity: (data) => {
-    const record: PetIdentity = {
-      ...data,
-      id: generateId(),
-      status: 'reviewing',
-      submittedAt: new Date().toISOString(),
-    };
-    set((s) => ({ records: [record, ...s.records] }));
-    return record;
+  fetchRecords: async () => {
+    const records = await fetchRecordsApi();
+    set({ records });
+  },
+
+  applyIdentity: async (data) => {
+    const record = await applyIdentityApi(data);
+    set((s) => ({
+      records: [record, ...s.records.filter((r) => r.petId !== record.petId)],
+    }));
   },
 
   getByIdentityPetId: (petId) => get().records.find((r) => r.petId === petId),

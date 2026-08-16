@@ -3,6 +3,7 @@ import { View, Text, ScrollView, Input } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useFeedStore } from '@/stores/useFeedStore';
 import { useAppStore } from '@/stores/useAppStore';
+import { useMessageStore } from '@/stores/useMessageStore';
 import FeedItem from '@/components/FeedItem';
 import CommentSheet from '@/components/CommentSheet';
 import CustomTabBar from '@/components/CustomTabBar';
@@ -22,6 +23,7 @@ export default function HallPage() {
 
   const showToast = useAppStore((s) => s.showToast);
   const [commentFeedId, setCommentFeedId] = useState<string | null>(null);
+  const unread = useMessageStore((s) => s.messages.filter((m) => !m.read).length);
 
   useEffect(() => {
     fetchFeed();
@@ -54,6 +56,14 @@ export default function HallPage() {
     Taro.navigateTo({ url: '/pages/sub-pages/search/index' });
   };
 
+  const handlePostClick = () => {
+    Taro.navigateTo({ url: '/pages/post-modal/index' });
+  };
+
+  const handleMessagesClick = () => {
+    Taro.navigateTo({ url: '/pages/sub-pages/messages/index' });
+  };
+
   return (
     <View className='hall-page'>
       {/* Sticky Header */}
@@ -61,8 +71,18 @@ export default function HallPage() {
         <View className='hall-top-bar'>
           <Text className='hall-logo'>🐾 PawLife</Text>
           <View className='hall-icons'>
-            <Text className='hall-icon'>🔔</Text>
+            <View className='hall-bell' onClick={handleMessagesClick}>
+              <Text className='hall-icon'>🔔</Text>
+              {unread > 0 && (
+                <View className='hall-bell-badge'>
+                  <Text className='hall-bell-badge-text'>{unread > 99 ? '99+' : unread}</Text>
+                </View>
+              )}
+            </View>
             <Text className='hall-icon'>📷</Text>
+            <View className='hall-post-btn' onClick={handlePostClick}>
+              <Text className='hall-post-plus'>＋</Text>
+            </View>
           </View>
         </View>
 

@@ -1,0 +1,157 @@
+.messages-page {
+  min-height: 100vh;
+  background: #FFF8F3;
+  display: flex;
+  flex-direction: column;
+}
+
+.msg-toolbar {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 16rpx 24rpx;
+  flex-shrink: 0;
+  border-bottom: 1rpx solid #F0E8E0;
+}
+
+.msg-tabs {
+  flex: 1;
+  display: flex;
+}
+
+.msg-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16rpx 0;
+  color: #9B958E;
+
+  &--active {
+    color: #FF7A59;
+    font-weight: 700;
+  }
+}
+
+.msg-tab-text {
+  font-size: 26rpx;
+}
+
+.msg-read-all {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  padding: 10rpx 20rpx;
+  border-radius: 28rpx;
+  background: #FFF0EA;
+}
+
+.msg-read-all-text {
+  font-size: 24rpx;
+  color: #FF7A59;
+  font-weight: 600;
+}
+
+.msg-scroll {
+  flex: 1;
+}
+
+.msg-list {
+  padding: 16rpx 24rpx;
+}
+
+.msg-item {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 20rpx;
+  padding: 24rpx;
+  margin-bottom: 16rpx;
+
+  &--unread {
+    background: #FFFDFB;
+    box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.04);
+  }
+}
+
+.msg-avatar {
+  position: relative;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background: #FFF0EA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.msg-avatar-emoji {
+  font-size: 40rpx;
+}
+
+.msg-dot {
+  position: absolute;
+  top: -4rpx;
+  right: -4rpx;
+  width: 18rpx;
+  height: 18rpx;
+  border-radius: 50%;
+  background: #FF4D4F;
+  border: 4rpx solid #fff;
+}
+
+.msg-body {
+  flex: 1;
+  margin-left: 20rpx;
+  min-width: 0;
+}
+
+.msg-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.msg-title {
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #2D2A26;
+}
+
+.msg-time {
+  font-size: 22rpx;
+  color: #B8A99A;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+
+.msg-content {
+  display: block;
+  font-size: 26rpx;
+  color: #9B958E;
+  margin-top: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.msg-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 160rpx 0;
+}
+
+.msg-empty-emoji {
+  font-size: 96rpx;
+}
+
+.msg-empty-text {
+  font-size: 28rpx;
+  color: #B8A99A;
+  margin-top: 24rpx;
+}
+
+.msg-bottom-safe {
+  height: 60rpx;
+}

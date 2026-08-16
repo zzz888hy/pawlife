@@ -1,57 +1,54 @@
+/**
+ * 云函数：user
+ * 用户信息操作：getProfile / updateProfile / addCoins / setVip
+ */
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
+
 const db = cloud.database();
-const _ = db.command;
 
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
-  const { action, data } = event;
+  const { action, data } = event || {};
 
-  if (!OPENID) return { code: -1, message: '未登录' };
+  const users = db.collection('users');
+  const res = await users.where({ openid: OPENID }).get();
+  if (res.data.length === 0) {
+    return { code: 404, message: '用户不存在，请先登录' };
+  }
+  const user = res.data[0];
 
-  try {
-    switch (action) {
-      case 'getProfile':
-        return await getProfile(OPENID);
-      case 'updateProfile':
-        return await updateProfile(OPENID, data);
-      case 'addCoins':
-        return await addCoins(OPENID, data.amount);
-      case 'setVip':
-        return await setVip(OPENID, data.plan);
-      default:
-        return { code: -1, message: '未知操作' };
+  switch (action) {
+    case 'getProfile':
+      return { code: 0, data: user };
+
+    case 'updateProfile': {
+      const patch = { ...(data || {}), updatedAt: db.serverDate() };
+      await users.doc(user._id).update({ data: patch });
+      return { code: 0, data: { ...user, ...patch } };
     }
-  } catch (err) {
-    return { code: -1, message: err.message };
+
+    case 'addCoins': {
+      const amount = (data && data.amount) || 0;
+      const newCoins = (user.coins || 0) + amount;
+      await users.doc(user._id).update({
+        data: { coins: newCoins, updatedAt: db.serverDate() },
+      });
+      return { code: 0, data: { coins: newCoins } };
+    }
+
+    case 'setVip': {
+      const plan = data && data.plan;
+      const days = plan === 'yearly' ? 365 : 30;
+      const expireAt = Date.now() + days * 24 * 3600 * 1000;
+      const vipExpireDate = new Date(expireAt).toISOString();
+      await users.doc(user._id).update({
+        data: { isVip: true, vipExpireDate, updatedAt: db.serverDate() },
+      });
+      return { code: 0, data: { isVip: true, vipExpireDate } };
+    }
+
+    default:
+      return { code: 400, message: '未知操作' };
   }
 };
-
-async function getProfile(openid) {
-  const res = await db.collection('users').where({ openid }).get();
-  if (res.data.length === 0) return { code: -1, message: '用户不存在' };
-  return { code: 0, data: res.data[0] };
-}
-
-async function updateProfile(openid, data) {
-  await db.collection('users').where({ openid }).update({ data });
-  return { code: 0, message: '更新成功' };
-}
-
-async function addCoins(openid, amount) {
-  await db.collection('users').where({ openid }).update({
-    data: { coins: _.inc(amount) },
-  });
-  return { code: 0, message: '金币已更新' };
-}
-
-async function setVip(openid, plan) {
-  const expireDate = new Date();
-  expireDate.setFullYear(expireDate.getFullYear() + (plan === 'yearly' ? 1 : 0));
-  expireDate.setMonth(expireDate.getMonth() + (plan === 'monthly' ? 1 : 0));
-
-  await db.collection('users').where({ openid }).update({
-    data: { isVip: true, vipExpireDate: expireDate.toISOString() },
-  });
-  return { code: 0, message: '会员开通成功' };
-}

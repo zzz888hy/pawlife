@@ -1,0 +1,277 @@
+.friends-page {
+  min-height: 100vh;
+  background: #FFF8F3;
+  display: flex;
+  flex-direction: column;
+}
+
+// ============ Tabs ============
+.friends-tabs {
+  display: flex;
+  background: #fff;
+  padding: 0 32rpx;
+  flex-shrink: 0;
+}
+
+.friends-tab {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28rpx 0;
+  font-size: 28rpx;
+  color: #9B958E;
+
+  &--active {
+    color: #2D2A26;
+    font-weight: 700;
+
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 48rpx;
+      height: 6rpx;
+      border-radius: 3rpx;
+      background: linear-gradient(135deg, #FF7A59, #FF9A76);
+    }
+  }
+}
+
+.friends-tab-text {
+  font-size: 28rpx;
+}
+
+.friends-tab-badge {
+  position: absolute;
+  top: 16rpx;
+  right: 32rpx;
+  min-width: 32rpx;
+  height: 32rpx;
+  padding: 0 8rpx;
+  border-radius: 16rpx;
+  background: #FF4D4F;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.friends-tab-badge-text {
+  font-size: 20rpx;
+  color: #fff;
+  line-height: 1;
+}
+
+// ============ Scroll ============
+.friends-scroll {
+  flex: 1;
+}
+
+.friends-list {
+  padding: 24rpx;
+}
+
+// ============ Friend Card ============
+.friend-card {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+}
+
+.friend-avatar {
+  position: relative;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: #FFF0EA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.friend-avatar-emoji {
+  font-size: 48rpx;
+}
+
+.friend-online-dot {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 22rpx;
+  height: 22rpx;
+  border-radius: 50%;
+  background: #4CD964;
+  border: 4rpx solid #fff;
+}
+
+.friend-body {
+  flex: 1;
+  margin-left: 20rpx;
+  min-width: 0;
+}
+
+.friend-name-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.friend-name {
+  font-size: 30rpx;
+  font-weight: 700;
+  color: #2D2A26;
+}
+
+.friend-distance {
+  font-size: 22rpx;
+  color: #B8A99A;
+}
+
+.friend-pet-row {
+  margin-top: 6rpx;
+}
+
+.friend-pet {
+  font-size: 24rpx;
+  color: #7C6F5F;
+}
+
+.friend-signature {
+  display: block;
+  font-size: 24rpx;
+  color: #9B958E;
+  margin-top: 8rpx;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-tags {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10rpx;
+}
+
+.friend-tag {
+  font-size: 22rpx;
+  color: #FF7A59;
+  margin-right: 12rpx;
+}
+
+// ============ Action Buttons ============
+.friend-add-btn,
+.friend-chat-btn {
+  flex-shrink: 0;
+  margin-left: 16rpx;
+  align-self: center;
+  border-radius: 36rpx;
+  padding: 14rpx 28rpx;
+}
+
+.friend-add-btn {
+  background: linear-gradient(135deg, #FF7A59, #FF9A76);
+  box-shadow: 0 6rpx 16rpx rgba(255, 122, 89, 0.3);
+}
+
+.friend-add-btn--pending {
+  background: #f2f2f2;
+  box-shadow: none;
+}
+
+.friend-add-btn--pending .friend-add-text {
+  color: #b0b0b0;
+}
+
+.friend-add-text {
+  font-size: 24rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+.friend-chat-btn {
+  background: #FFF0EA;
+  border: 2rpx solid #FFD6C8;
+}
+
+.friend-chat-text {
+  font-size: 24rpx;
+  color: #FF7A59;
+  font-weight: 600;
+}
+
+// ============ Request Card ============
+.request-card {
+  display: flex;
+  align-items: flex-start;
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx 24rpx;
+  margin-bottom: 20rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0, 0, 0, 0.03);
+}
+
+.request-message {
+  display: block;
+  font-size: 26rpx;
+  color: #6B5E53;
+  margin-top: 8rpx;
+}
+
+.request-actions {
+  display: flex;
+  margin-top: 20rpx;
+}
+
+.request-accept {
+  background: linear-gradient(135deg, #FF7A59, #FF9A76);
+  border-radius: 36rpx;
+  padding: 14rpx 44rpx;
+  margin-right: 20rpx;
+}
+
+.request-accept-text {
+  font-size: 26rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+.request-reject {
+  background: #F5F0EB;
+  border-radius: 36rpx;
+  padding: 14rpx 44rpx;
+}
+
+.request-reject-text {
+  font-size: 26rpx;
+  color: #9B958E;
+}
+
+// ============ Empty ============
+.friends-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 160rpx 0;
+}
+
+.friends-empty-emoji {
+  font-size: 96rpx;
+}
+
+.friends-empty-text {
+  font-size: 28rpx;
+  color: #B8A99A;
+  margin-top: 24rpx;
+}
+
+.friends-bottom-safe {
+  height: 60rpx;
+}

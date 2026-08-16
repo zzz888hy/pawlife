@@ -6,6 +6,7 @@ export default defineAppConfig({
     'pages/post-modal/index',
     'pages/marketplace/index',
     'pages/profile/index',
+    'pages/friends/index',
   ],
   subPackages: [
     {
@@ -27,6 +28,12 @@ export default defineAppConfig({
         'pet-identity/index',
         'rank/index',
         'search/index',
+        'timeline/index',
+        'help/index',
+        'about/index',
+        'album/index',
+        'chat/index',
+        'messages/index',
       ],
     },
   ],
@@ -56,16 +63,16 @@ export default defineAppConfig({
         selectedIconPath: 'assets/tabbar/paw.png',
       },
       {
-        pagePath: 'pages/post-modal/index',
-        text: '发布',
-        iconPath: 'assets/tabbar/plus.png',
-        selectedIconPath: 'assets/tabbar/plus.png',
-      },
-      {
         pagePath: 'pages/marketplace/index',
         text: '集市',
         iconPath: 'assets/tabbar/shop.png',
         selectedIconPath: 'assets/tabbar/shop.png',
+      },
+      {
+        pagePath: 'pages/friends/index',
+        text: '宠友广场',
+        iconPath: 'assets/tabbar/paw.png',
+        selectedIconPath: 'assets/tabbar/paw.png',
       },
       {
         pagePath: 'pages/profile/index',

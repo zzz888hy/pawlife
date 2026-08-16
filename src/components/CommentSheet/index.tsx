@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { View, Text, ScrollView, Input } from '@tarojs/components';
 import { useCommentStore } from '@/stores/useCommentStore';
 import { useFeedStore } from '@/stores/useFeedStore';
@@ -12,10 +12,16 @@ interface CommentSheetProps {
 }
 
 export default function CommentSheet({ feedId, visible, onClose }: CommentSheetProps) {
-  const { getByFeedId, addComment } = useCommentStore();
+  const { getByFeedId, addComment, fetchComments } = useCommentStore();
   const incrementCmts = useFeedStore((s) => s.incrementCmts);
   const { nickname, avatar } = useUserStore();
   const [text, setText] = useState('');
+
+  useEffect(() => {
+    if (visible && feedId) {
+      fetchComments(feedId);
+    }
+  }, [visible, feedId]);
 
   if (!visible) return null;
 

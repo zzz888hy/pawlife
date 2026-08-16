@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import { View, Text, Input, ScrollView } from '@tarojs/components';
+import { View, Text, Input, ScrollView, Image } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { usePetStore } from '@/stores/usePetStore';
 import { useAppStore } from '@/stores/useAppStore';
+import { chooseImage } from '@/services/cloud';
 import SubPageHeader from '@/components/SubPageHeader';
 import type { PetType } from '@/types';
 import './index.scss';
@@ -13,8 +14,6 @@ const PET_TYPES: { type: PetType; emoji: string; label: string }[] = [
   { type: '兔', emoji: '🐰', label: '兔' },
   { type: '其他', emoji: '🐾', label: '其他' },
 ];
-
-const PHOTO_EMOJIS = ['🐶', '🐱', '🐾', '🌟', '💖', '🎉', '🌸', '🦴', '🎾', '🏠', '☀️', '🌈'];
 
 interface FormData {
   name: string;
@@ -48,7 +47,7 @@ export default function CreatePetPage() {
     setFormData((prev) => ({ ...prev, [key]: value }));
   };
 
-  const handlePhotoTap = (index: number) => {
+  const handlePhotoTap = async (index: number) => {
     if (formData.photoSlots[index]) {
       // Remove photo
       const newSlots = [...formData.photoSlots];
@@ -56,11 +55,13 @@ export default function CreatePetPage() {
       updateField('photoSlots', newSlots);
       return;
     }
-    // Fill with random emoji
-    const randomEmoji = PHOTO_EMOJIS[Math.floor(Math.random() * PHOTO_EMOJIS.length)];
-    const newSlots = [...formData.photoSlots];
-    newSlots[index] = randomEmoji;
-    updateField('photoSlots', newSlots);
+    // Choose real photo from camera/album
+    const paths = await chooseImage(1);
+    if (paths.length > 0) {
+      const newSlots = [...formData.photoSlots];
+      newSlots[index] = paths[0];
+      updateField('photoSlots', newSlots);
+    }
   };
 
   const handleNext = () => {
@@ -260,14 +261,14 @@ export default function CreatePetPage() {
               <Text className='cp-label'>宠物照片</Text>
               <Text className='cp-hint'>点击空格添加照片（最多6张）</Text>
               <View className='cp-photo-grid'>
-                {formData.photoSlots.map((emoji, i) => (
+                {formData.photoSlots.map((photo, i) => (
                   <View
                     key={i}
-                    className={`cp-photo-slot ${emoji ? 'filled' : ''}`}
+                    className={`cp-photo-slot ${photo ? 'filled' : ''}`}
                     onClick={() => handlePhotoTap(i)}
                   >
-                    {emoji ? (
-                      <Text className='cp-photo-emoji'>{emoji}</Text>
+                    {photo ? (
+                      <Image className='cp-photo-img' src={photo} mode='aspectFill' />
                     ) : (
                       <Text className='cp-photo-plus'>+</Text>
                     )}

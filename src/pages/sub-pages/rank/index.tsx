@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import SubPageHeader from '@/components/SubPageHeader';
-import { mockRankEntries, RankEntry } from '@/services/mock/rank.mock';
+import { RankEntry } from '@/services/mock/rank.mock';
+import { fetchRank } from '@/services/rank';
 import './index.scss';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
@@ -12,8 +14,14 @@ const TREND_MAP: Record<RankEntry['trend'], { icon: string; text: string }> = {
 };
 
 export default function RankPage() {
-  const top3 = mockRankEntries.slice(0, 3);
-  const rest = mockRankEntries.slice(3);
+  const [entries, setEntries] = useState<RankEntry[]>([]);
+
+  useEffect(() => {
+    fetchRank().then(setEntries).catch(() => {});
+  }, []);
+
+  const top3 = entries.slice(0, 3);
+  const rest = entries.slice(3);
 
   return (
     <View className='rank-page'>

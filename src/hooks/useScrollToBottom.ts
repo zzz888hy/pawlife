@@ -1,4 +1,5 @@
 import { useRef, useCallback } from 'react';
+import Taro from '@tarojs/taro';
 
 export function useScrollToBottom() {
   const scrollViewRef = useRef<any>(null);
@@ -7,13 +8,11 @@ export function useScrollToBottom() {
     // Use setTimeout to wait for the next render cycle
     setTimeout(() => {
       if (scrollViewRef.current) {
-        // For ScrollView in Taro, we can use the scrollTop prop
-        // but it's a controlled prop. Instead, we can use
-        // the createSelectorQuery API
-        const query = wx.createSelectorQuery();
+        // 用 Taro 的 createSelectorQuery 替代全局 wx
+        const query = Taro.createSelectorQuery();
         query.select('.chat-area').boundingClientRect();
         query.select('.chat-bottom').boundingClientRect();
-        query.exec((res) => {
+        query.exec((res: any[]) => {
           if (res[0] && res[1]) {
             // Logic to scroll to bottom
           }

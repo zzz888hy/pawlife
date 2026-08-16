@@ -12,6 +12,7 @@ export interface FeedItem {
   tags: string[];
   pics: number;         // 1 or 2
   picsEmoji: string[];
+  images?: string[];    // 真实图片路径(可选)
   likes: number;
   cmts: number;
   liked: boolean;

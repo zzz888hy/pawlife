@@ -1,5 +1,6 @@
 {
   "miniprogramRoot": "dist/",
+  "cloudfunctionRoot": "cloudfunctions/",
   "projectname": "pawlife-taro",
   "description": "PawLife 宠物数字生命空间",
   "appid": "wxf15929f41c49a0ac",

@@ -1,7 +1,6 @@
 import { View, Text } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useAppStore } from '@/stores/useAppStore';
-import CustomTabBar from '@/components/CustomTabBar';
 import './index.scss';
 
 interface PostOption {
@@ -15,7 +14,7 @@ export default function PostModalPage() {
   const showToast = useAppStore((s) => s.showToast);
 
   const handleClose = () => {
-    Taro.switchTab({ url: '/pages/hall/index' });
+    Taro.navigateBack();
   };
 
   const options: PostOption[] = [
@@ -48,7 +47,7 @@ export default function PostModalPage() {
       title: '上传相册',
       desc: 'AI自动整理',
       action: () => {
-        showToast('相册上传功能开发中～');
+        Taro.navigateTo({ url: '/pages/sub-pages/album/index' });
       },
     },
   ];
@@ -82,7 +81,6 @@ export default function PostModalPage() {
         </View>
       </View>
 
-      <CustomTabBar />
     </View>
   );
 }

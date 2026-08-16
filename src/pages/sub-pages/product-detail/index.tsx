@@ -48,9 +48,9 @@ export default function ProductDetailPage() {
     Taro.showToast({ title: '已加入购物车', icon: 'success' });
   };
 
-  const handleBuyNow = () => {
+  const handleBuyNow = async () => {
     // 立即购买：直接生成一笔待付款订单
-    placeOrder(
+    await placeOrder(
       [
         {
           productId: product.id,

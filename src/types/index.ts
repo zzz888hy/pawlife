@@ -5,3 +5,5 @@ export * from './chat';
 export * from './task';
 export * from './user';
 export * from './api';
+export * from './friend';
+export * from './message';

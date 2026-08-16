@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useAppStore } from '@/stores/useAppStore';
@@ -9,7 +10,14 @@ export default function CartPage() {
   const products = useMarketStore((s) => s.products);
   const removeFromCart = useMarketStore((s) => s.removeFromCart);
   const placeOrder = useMarketStore((s) => s.placeOrder);
+  const fetchCart = useMarketStore((s) => s.fetchCart);
+  const fetchProducts = useMarketStore((s) => s.fetchProducts);
   const showToast = useAppStore((s) => s.showToast);
+
+  useEffect(() => {
+    fetchProducts();
+    fetchCart();
+  }, []);
 
   const cartItems = cart
     .map((c) => {
@@ -35,7 +43,7 @@ export default function CartPage() {
     Taro.showModal({
       title: '确认下单',
       content: `共 ${cartItems.length} 件商品，合计 ¥${totalPrice.toFixed(1)}`,
-      success: (res) => {
+      success: async (res) => {
         if (res.confirm) {
           // 生成订单
           const orderItems = cartItems
@@ -48,7 +56,7 @@ export default function CartPage() {
               price: item!.product!.price,
               quantity: item!.quantity,
             }));
-          placeOrder(orderItems, totalPrice);
+          await placeOrder(orderItems, totalPrice);
           // 清空购物车
           cartItems.forEach((item) => {
             if (item?.product) {

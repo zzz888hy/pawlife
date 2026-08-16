@@ -10,6 +10,7 @@ interface FeedItemProps {
 }
 
 export default function FeedItem({ item, onLike, onCollect, onComment }: FeedItemProps) {
+  const imgs = item.images && item.images.length > 0 ? item.images : null;
   return (
     <View className='feed-item'>
       {/* Header */}
@@ -26,7 +27,22 @@ export default function FeedItem({ item, onLike, onCollect, onComment }: FeedIte
       </View>
 
       {/* Photos */}
-      {item.pics === 2 ? (
+      {imgs && imgs.length >= 2 ? (
+        <View className='feed-pics two'>
+          <View className='feed-pic' style={{ background: item.bg }}>
+            <Image className='feed-pic-img' src={imgs[0]} mode='aspectFill' />
+          </View>
+          <View className='feed-pic' style={{ background: item.bg }}>
+            <Image className='feed-pic-img' src={imgs[1]} mode='aspectFill' />
+          </View>
+        </View>
+      ) : imgs && imgs.length === 1 ? (
+        <View className='feed-pics one'>
+          <View className='feed-pic feed-pic--large' style={{ background: item.bg }}>
+            <Image className='feed-pic-img' src={imgs[0]} mode='aspectFill' />
+          </View>
+        </View>
+      ) : item.pics === 2 ? (
         <View className='feed-pics two'>
           <View className='feed-pic' style={{ background: item.bg }}>
             <Text>{item.picsEmoji[0]}</Text>
