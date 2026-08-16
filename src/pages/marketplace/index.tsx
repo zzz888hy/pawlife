@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useMarketStore } from '@/stores/useMarketStore';
+import type { SellerType } from '@/types';
 import ProductCard from '@/components/ProductCard';
 import SectionTitle from '@/components/SectionTitle';
 import CustomTabBar from '@/components/CustomTabBar';
@@ -16,8 +17,14 @@ const MARKET_CATEGORIES = [
   { key: '医疗', label: '医疗', emoji: '💊' },
 ];
 
+const SELLER_TABS: { key: SellerType; label: string }[] = [
+  { key: 'merchant', label: '🛍️ 商家' },
+  { key: 'personal', label: '♻️ 个人二手' },
+];
+
 export default function MarketplacePage() {
   const { products, fetchProducts } = useMarketStore();
+  const [sellerType, setSellerType] = useState<SellerType>('merchant');
   const [activeCategory, setActiveCategory] = useState('用品');
 
   useEffect(() => {
@@ -37,13 +44,26 @@ export default function MarketplacePage() {
   };
 
   const filteredProducts = products.filter(
-    (p) => !activeCategory || p.category === activeCategory
+    (p) => p.sellerType === sellerType && (!activeCategory || p.category === activeCategory)
   );
 
   return (
     <View className="marketplace-page">
       {/* Section Title */}
       <SectionTitle title="🐾 宠物生活馆" />
+
+      {/* 商家 / 个人二手 切换 */}
+      <View className="seller-tabs">
+        {SELLER_TABS.map((tab) => (
+          <View
+            key={tab.key}
+            className={`seller-tab ${sellerType === tab.key ? 'active' : ''}`}
+            onClick={() => setSellerType(tab.key)}
+          >
+            <Text>{tab.label}</Text>
+          </View>
+        ))}
+      </View>
 
       {/* Market Banner */}
       <View className="market-banner">

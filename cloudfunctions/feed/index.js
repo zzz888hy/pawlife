@@ -8,6 +8,23 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
 
+// 把 cloud:// 文件ID 批量替换成临时 https 链接（云函数签发，不受存储「仅创建者可读写」限制）
+async function toTempUrls(ids) {
+  const fileIds = [...new Set((ids || []).filter((id) => typeof id === 'string' && id.startsWith('cloud://')))];
+  if (fileIds.length === 0) return {};
+  try {
+    const res = await cloud.getTempFileURL({ fileList: fileIds });
+    const map = {};
+    (res.fileList || []).forEach((f) => {
+      if (f.status === 0 && f.tempFileURL) map[f.fileID] = f.tempFileURL;
+    });
+    return map;
+  } catch (err) {
+    console.error('getTempFileURL error:', err);
+    return {};
+  }
+}
+
 exports.main = async (event) => {
   const { OPENID } = cloud.getWXContext();
   const { action, data } = event || {};
@@ -24,6 +41,19 @@ exports.main = async (event) => {
         cmts: item.commentCount || 0,
         liked: (item.likeOpenids || []).includes(OPENID),
       }));
+
+      // 图片 / 宠物头像转临时链接，其他用户才能看到
+      const fileIds = [];
+      list.forEach((f) => {
+        if (Array.isArray(f.images)) fileIds.push(...f.images);
+        if (f.pet) fileIds.push(f.pet);
+      });
+      const urlMap = await toTempUrls(fileIds);
+      list.forEach((f) => {
+        if (Array.isArray(f.images)) f.images = f.images.map((id) => urlMap[id] || id);
+        if (urlMap[f.pet]) f.pet = urlMap[f.pet];
+      });
+
       return { code: 0, data: list };
     }
 

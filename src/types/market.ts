@@ -1,3 +1,5 @@
+export type SellerType = 'merchant' | 'personal'; // 商家 / 个人二手
+
 export interface Product {
   id: string;
   emoji: string;
@@ -7,6 +9,7 @@ export interface Product {
   sold: string;         // "3.2万"
   bg: string;           // gradient
   category: string;
+  sellerType: SellerType;
   description?: string;
   rating?: number;
   tags?: string[];

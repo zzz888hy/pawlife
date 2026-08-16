@@ -38,6 +38,7 @@ function toProduct(raw: any): Product {
     sold: formatSold(raw.soldCount || 0),
     bg: raw.bg || pickBg(raw._id),
     category: raw.category,
+    sellerType: raw.sellerType === 'personal' ? 'personal' : 'merchant',
     description: raw.description,
     rating: raw.rating,
     tags: raw.tags || [],

@@ -54,6 +54,10 @@ export default function HallPage() {
     setCommentFeedId(id);
   };
 
+  const handleOpen = (id: string) => {
+    Taro.navigateTo({ url: `/pages/sub-pages/feed-detail/index?feedId=${id}` });
+  };
+
   const handleRankClick = () => {
     Taro.navigateTo({ url: '/pages/sub-pages/rank/index' });
   };
@@ -161,6 +165,7 @@ export default function HallPage() {
               onLike={handleLike}
               onCollect={handleCollect}
               onComment={handleComment}
+              onOpen={() => handleOpen(item.id)}
             />
           ))
         )}

@@ -1,0 +1,187 @@
+.feed-detail-page {
+  min-height: 100vh;
+  background: #FFF8F3;
+  padding-bottom: 140rpx;
+}
+
+.fd-scroll {
+  height: calc(100vh - 120rpx);
+}
+
+// 作者信息
+.fd-head {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  padding: 24rpx 28rpx;
+  background: #fff;
+}
+
+.fd-avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 44rpx;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.fd-avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
+.fd-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.fd-name {
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.fd-tag {
+  font-size: 20rpx;
+  color: #FF7A59;
+  background: #FFF0EA;
+  padding: 6rpx 16rpx;
+  border-radius: 20rpx;
+  font-weight: 600;
+  margin-left: 8rpx;
+}
+
+.fd-meta {
+  font-size: 22rpx;
+  color: #9B958E;
+  margin-top: 4rpx;
+  display: block;
+}
+
+// 图片网格
+.fd-imgs {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4rpx;
+  padding: 0 28rpx;
+  background: #fff;
+}
+
+.fd-imgs--one {
+  grid-template-columns: 1fr;
+}
+
+.fd-img {
+  width: 100%;
+  height: 220rpx;
+  border-radius: 12rpx;
+  background: #F0ECE6;
+}
+
+.fd-imgs--one .fd-img {
+  height: 600rpx;
+}
+
+// 无图占位
+.fd-noimg {
+  margin: 0 28rpx;
+  height: 400rpx;
+  border-radius: 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.fd-noimg-emoji {
+  font-size: 160rpx;
+}
+
+.fd-noimg-img {
+  width: 100%;
+  height: 100%;
+}
+
+// 正文
+.fd-body {
+  background: #fff;
+  margin-top: 20rpx;
+  padding: 28rpx;
+}
+
+.fd-txt {
+  font-size: 30rpx;
+  line-height: 1.6;
+  display: block;
+}
+
+.fd-tags {
+  display: flex;
+  gap: 12rpx;
+  flex-wrap: wrap;
+  margin-top: 20rpx;
+}
+
+.fd-tag-item {
+  font-size: 22rpx;
+  color: #FF7A59;
+  background: #FFF0EA;
+  padding: 4rpx 16rpx;
+  border-radius: 20rpx;
+}
+
+.fd-bottom-safe {
+  height: 40rpx;
+}
+
+// 底部操作栏
+.fd-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  padding: 20rpx 24rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1rpx solid #F0E8E0;
+}
+
+.fd-act {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: 26rpx;
+  color: #6B6560;
+
+  &.liked {
+    color: #FF7A59;
+  }
+}
+
+.fd-act-ico {
+  font-size: 36rpx;
+}
+
+// 空态
+.fd-empty {
+  padding-top: 200rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.fd-empty-icon {
+  font-size: 100rpx;
+}
+
+.fd-empty-text {
+  font-size: 26rpx;
+  color: #9B958E;
+}

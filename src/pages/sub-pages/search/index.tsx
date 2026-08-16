@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, Input, ScrollView } from '@tarojs/components';
+import Taro from '@tarojs/taro';
 import SubPageHeader from '@/components/SubPageHeader';
 import FeedItem from '@/components/FeedItem';
 import { useFeedStore } from '@/stores/useFeedStore';
@@ -38,6 +39,10 @@ export default function SearchPage() {
 
   const handleComment = () => {
     showToast('评论请前往广场参与～');
+  };
+
+  const handleOpen = (id: string) => {
+    Taro.navigateTo({ url: `/pages/sub-pages/feed-detail/index?feedId=${id}` });
   };
 
   return (
@@ -94,6 +99,7 @@ export default function SearchPage() {
                 onLike={handleLike}
                 onCollect={handleCollect}
                 onComment={handleComment}
+                onOpen={() => handleOpen(item.id)}
               />
             ))}
           </View>

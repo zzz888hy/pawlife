@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro';
 import SubPageHeader from '@/components/SubPageHeader';
 import { useMarketStore } from '@/stores/useMarketStore';
 import { useAppStore } from '@/stores/useAppStore';
+import type { SellerType } from '@/types';
 import './index.scss';
 
 const CATEGORIES = [
@@ -13,6 +14,11 @@ const CATEGORIES = [
   { key: '穿搭', emoji: '👕' },
   { key: '纪念', emoji: '🖼️' },
   { key: '医疗', emoji: '💊' },
+];
+
+const SELLER_TYPES: { key: SellerType; label: string; desc: string }[] = [
+  { key: 'personal', label: '♻️ 个人二手', desc: '闲置转让、同城面交' },
+  { key: 'merchant', label: '🛍️ 商家', desc: '店铺销售、包邮发货' },
 ];
 
 // 商品图标 + 背景色组合，作为商品的"主图"
@@ -32,6 +38,7 @@ export default function CreateProductPage() {
   const showToast = useAppStore((s) => s.showToast);
 
   const [name, setName] = useState('');
+  const [sellerType, setSellerType] = useState<SellerType>('personal');
   const [category, setCategory] = useState('用品');
   const [price, setPrice] = useState('');
   const [oldPrice, setOldPrice] = useState('');
@@ -54,6 +61,7 @@ export default function CreateProductPage() {
     addProduct({
       name: name.trim(),
       category,
+      sellerType,
       price: Math.round(priceNum * 10) / 10,
       oldPrice: oldPrice && !isNaN(oldPriceNum) ? oldPriceNum : priceNum,
       emoji: icon.emoji,
@@ -68,6 +76,24 @@ export default function CreateProductPage() {
   return (
     <View className='create-product-page'>
       <SubPageHeader title='上架商品' />
+
+      {/* 出售类型 */}
+      <View className='cpr-section'>
+        <Text className='cpr-label'>出售类型</Text>
+        <View className='cpr-seller-types'>
+          {SELLER_TYPES.map((st) => (
+            <View
+              key={st.key}
+              className={`cpr-seller-type ${sellerType === st.key ? 'active' : ''}`}
+              onClick={() => setSellerType(st.key)}
+            >
+              <Text className='cpr-seller-type-label'>{st.label}</Text>
+              <Text className='cpr-seller-type-desc'>{st.desc}</Text>
+              {sellerType === st.key && <Text className='cpr-seller-type-check'>✓</Text>}
+            </View>
+          ))}
+        </View>
+      </View>
 
       {/* 商品名称 */}
       <View className='cpr-section'>

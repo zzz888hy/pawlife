@@ -8,12 +8,13 @@ interface FeedItemProps {
   onLike: (id: string) => void;
   onCollect: (id: string) => void;
   onComment: (id: string) => void;
+  onOpen: () => void;
 }
 
-export default function FeedItem({ item, onLike, onCollect, onComment }: FeedItemProps) {
+export default function FeedItem({ item, onLike, onCollect, onComment, onOpen }: FeedItemProps) {
   const imgs = item.images && item.images.length > 0 ? item.images : null;
   return (
-    <View className='feed-item'>
+    <View className='feed-item' onClick={onOpen}>
       {/* Header */}
       <View className='feed-head'>
         <View className='feed-avatar' style={{ background: item.bg }}>
@@ -82,20 +83,20 @@ export default function FeedItem({ item, onLike, onCollect, onComment }: FeedIte
       <View className='feed-actions'>
         <View
           className={`feed-act ${item.liked ? 'liked' : ''}`}
-          onClick={() => onLike(item.id)}
+          onClick={(e) => { e.stopPropagation(); onLike(item.id); }}
         >
           <Text className='feed-act-ico'>🐾</Text>
           <Text>{item.likes}</Text>
           <Text> 摸摸</Text>
         </View>
-        <View className='feed-act' onClick={() => onComment(item.id)}>
+        <View className='feed-act' onClick={(e) => { e.stopPropagation(); onComment(item.id); }}>
           <Text className='feed-act-ico'>💬</Text>
           <Text>{item.cmts}</Text>
           <Text> 蹭蹭</Text>
         </View>
         <View
           className={`feed-act ${item.collected ? 'liked' : ''}`}
-          onClick={() => onCollect(item.id)}
+          onClick={(e) => { e.stopPropagation(); onCollect(item.id); }}
         >
           <Text className='feed-act-ico'>⭐</Text>
           <Text>收藏</Text>

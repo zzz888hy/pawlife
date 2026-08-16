@@ -11,6 +11,9 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
   return (
     <View className='product-card' onClick={() => onClick(product)}>
       <View className='product-img' style={{ background: product.bg }}>
+        <View className={`product-seller-badge ${product.sellerType === 'personal' ? 'personal' : ''}`}>
+          <Text>{product.sellerType === 'personal' ? '个人二手' : '商家'}</Text>
+        </View>
         <Text>{product.emoji}</Text>
       </View>
       <View className='product-info'>

@@ -27,6 +27,7 @@ export default defineAppConfig({
         'settings/index',
         'pet-identity/index',
         'rank/index',
+        'feed-detail/index',
         'search/index',
         'timeline/index',
         'help/index',

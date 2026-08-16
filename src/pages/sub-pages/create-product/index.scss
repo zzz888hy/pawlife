@@ -33,6 +33,53 @@
   color: #9B958E;
 }
 
+.cpr-seller-types {
+  display: flex;
+  gap: 20rpx;
+}
+
+.cpr-seller-type {
+  flex: 1;
+  position: relative;
+  padding: 24rpx;
+  border: 2rpx solid #F0E8E0;
+  border-radius: 20rpx;
+
+  &.active {
+    border-color: #FF7A59;
+    background: #FFF0EA;
+  }
+}
+
+.cpr-seller-type-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #2D2A26;
+}
+
+.cpr-seller-type-desc {
+  display: block;
+  font-size: 22rpx;
+  color: #9B958E;
+  margin-top: 8rpx;
+}
+
+.cpr-seller-type-check {
+  position: absolute;
+  top: 12rpx;
+  right: 12rpx;
+  width: 36rpx;
+  height: 36rpx;
+  border-radius: 50%;
+  background: #FF7A59;
+  color: #fff;
+  font-size: 22rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .cpr-cats {
   display: flex;
   flex-wrap: wrap;

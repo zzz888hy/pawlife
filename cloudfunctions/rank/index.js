@@ -8,6 +8,23 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
 
+// 把 cloud:// 文件ID 批量替换成临时 https 链接
+async function toTempUrls(ids) {
+  const fileIds = [...new Set((ids || []).filter((id) => typeof id === 'string' && id.startsWith('cloud://')))];
+  if (fileIds.length === 0) return {};
+  try {
+    const res = await cloud.getTempFileURL({ fileList: fileIds });
+    const map = {};
+    (res.fileList || []).forEach((f) => {
+      if (f.status === 0 && f.tempFileURL) map[f.fileID] = f.tempFileURL;
+    });
+    return map;
+  } catch (err) {
+    console.error('getTempFileURL error:', err);
+    return {};
+  }
+}
+
 const BG_GRADIENTS = [
   'linear-gradient(135deg,#FFF0EA,#FFE4D6)',
   'linear-gradient(135deg,#FFE4C4,#FFD9B0)',
@@ -92,6 +109,12 @@ exports.main = async (event) => {
         };
       });
       await Promise.all(writes);
+
+      // pet 头像（可能是 cloud://）转临时链接，其他用户才能看到
+      const urlMap = await toTempUrls(data.map((d) => d.pet));
+      data.forEach((d) => {
+        if (urlMap[d.pet]) d.pet = urlMap[d.pet];
+      });
 
       return { code: 0, data };
     }
