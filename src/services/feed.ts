@@ -14,6 +14,7 @@ interface RawFeed {
   petName: string;
   breed: string;
   owner?: string;
+  ownerAvatar?: string;
   txt: string;
   tags?: string[];
   images?: string[];
@@ -79,6 +80,7 @@ function toFeed(raw: RawFeed): FeedItem {
     age: '',
     owner: raw.owner || '@宠物主人',
     ownerId: 'me',
+    ownerAvatar: raw.ownerAvatar || raw.pet,
     time: formatRelativeTime(raw.createdAt),
     bg: pickBg(raw._id),
     txt: raw.txt,
@@ -123,6 +125,7 @@ export async function createFeed(data: CreateFeedData): Promise<FeedItem> {
       age: '3岁',
       owner: '@宠物主人',
       ownerId: 'me',
+      ownerAvatar: '😎',
       time: '刚刚',
       bg: 'linear-gradient(135deg,#FFF0EA,#FFE4D6)',
       txt: data.text,

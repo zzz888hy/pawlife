@@ -6,6 +6,7 @@ export interface FeedItem {
   age: string;
   owner: string;
   ownerId: string;
+  ownerAvatar: string;  // 主人头像（emoji 或图片路径）
   time: string;
   bg: string;           // gradient background
   txt: string;

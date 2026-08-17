@@ -15,6 +15,7 @@ export default defineAppConfig({
         'ai-assistant/index',
         'memorial-hall/index',
         'create-pet/index',
+        'edit-avatar/index',
         'health-records/index',
         'vip-membership/index',
         'product-detail/index',

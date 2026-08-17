@@ -1,8 +1,9 @@
 import { useEffect } from 'react';
-import { View, Text, ScrollView } from '@tarojs/components';
+import { View, Text, ScrollView, Image } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useUserStore } from '@/stores/useUserStore';
 import { useTaskStore } from '@/stores/useTaskStore';
+import { isImageUrl } from '@/utils/format';
 import CustomTabBar from '@/components/CustomTabBar';
 import './index.scss';
 
@@ -57,15 +58,24 @@ export default function ProfilePage() {
     Taro.navigateTo({ url: '/pages/sub-pages/vip-membership/index' });
   };
 
+  const handleAvatarTap = () => {
+    Taro.navigateTo({ url: '/pages/sub-pages/edit-avatar/index' });
+  };
+
   return (
     <ScrollView className="profile-page" scrollY>
       {/* Header */}
       <View className="mine-header">
-        <View className="header-avatar-wrap">
+        <View className="header-avatar-wrap" onClick={handleAvatarTap}>
           <View className="header-avatar">
-            <Text className="avatar-placeholder">
-              {avatar}
-            </Text>
+            {isImageUrl(avatar) ? (
+              <Image className="avatar-img" src={avatar} mode="aspectFill" />
+            ) : (
+              <Text className="avatar-placeholder">{avatar}</Text>
+            )}
+          </View>
+          <View className="avatar-edit-badge">
+            <Text>📷</Text>
           </View>
         </View>
         <Text className="header-name">{nickname || 'PawLife用户'}</Text>

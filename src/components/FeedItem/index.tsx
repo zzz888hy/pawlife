@@ -18,10 +18,10 @@ export default function FeedItem({ item, onLike, onCollect, onComment, onOpen }:
       {/* Header */}
       <View className='feed-head'>
         <View className='feed-avatar' style={{ background: item.bg }}>
-          {isImageUrl(item.pet) ? (
-            <Image className='feed-avatar-img' src={item.pet} mode='aspectFill' />
+          {isImageUrl(item.ownerAvatar) ? (
+            <Image className='feed-avatar-img' src={item.ownerAvatar} mode='aspectFill' />
           ) : (
-            <Text>{item.pet}</Text>
+            <Text>{item.ownerAvatar || item.pet}</Text>
           )}
         </View>
         <View className='feed-info'>

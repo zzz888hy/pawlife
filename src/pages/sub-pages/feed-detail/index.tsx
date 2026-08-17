@@ -65,10 +65,10 @@ export default function FeedDetailPage() {
         {/* 作者信息 */}
         <View className='fd-head'>
           <View className='fd-avatar' style={{ background: feed.bg }}>
-            {isImageUrl(feed.pet) ? (
-              <Image className='fd-avatar-img' src={feed.pet} mode='aspectFill' />
+            {isImageUrl(feed.ownerAvatar) ? (
+              <Image className='fd-avatar-img' src={feed.ownerAvatar} mode='aspectFill' />
             ) : (
-              <Text>{feed.pet}</Text>
+              <Text>{feed.ownerAvatar || feed.pet}</Text>
             )}
           </View>
           <View className='fd-info'>

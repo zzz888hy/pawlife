@@ -1,0 +1,136 @@
+.edit-avatar-page {
+  min-height: 100vh;
+  background: #FFF8F3;
+  padding-bottom: 160rpx;
+}
+
+.ea-body {
+  padding: 20rpx 24rpx;
+}
+
+// 预览
+.ea-preview-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 0 32rpx;
+}
+
+.ea-preview {
+  width: 200rpx;
+  height: 200rpx;
+  border-radius: 50%;
+  background: #fff;
+  border: 4rpx solid #FF7A59;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 8rpx 24rpx rgba(255, 122, 89, 0.2);
+}
+
+.ea-preview-emoji {
+  font-size: 96rpx;
+  line-height: 1;
+}
+
+.ea-preview-img {
+  width: 100%;
+  height: 100%;
+}
+
+.ea-preview-hint {
+  font-size: 24rpx;
+  color: #9B958E;
+  margin-top: 24rpx;
+}
+
+// 区块
+.ea-section {
+  background: #fff;
+  border-radius: 24rpx;
+  padding: 28rpx;
+  margin-bottom: 20rpx;
+}
+
+.ea-label {
+  font-size: 28rpx;
+  font-weight: 700;
+  color: #2D2A26;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+// 上传按钮
+.ea-upload-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14rpx;
+  height: 96rpx;
+  border: 2rpx dashed #FFC4B4;
+  border-radius: 20rpx;
+  background: #FFF7F3;
+  color: #FF7A59;
+  font-size: 28rpx;
+  font-weight: 600;
+}
+
+.ea-upload-icon {
+  font-size: 40rpx;
+}
+
+// emoji 网格
+.ea-emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16rpx;
+}
+
+.ea-emoji-item {
+  aspect-ratio: 1;
+  border-radius: 20rpx;
+  background: #F7F4F0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 4rpx solid transparent;
+
+  &.selected {
+    border-color: #FF7A59;
+    background: #FFF0EA;
+  }
+}
+
+.ea-emoji {
+  font-size: 56rpx;
+  line-height: 1;
+}
+
+// 底部保存
+.ea-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 24rpx;
+  padding-bottom: calc(20rpx + env(safe-area-inset-bottom));
+  background: #fff;
+  border-top: 1rpx solid #F0E8E0;
+}
+
+.ea-save-btn {
+  width: 100%;
+  background: linear-gradient(135deg, #FF7A59, #FF9A76);
+  color: #fff;
+  text-align: center;
+  padding: 26rpx;
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  font-weight: 700;
+  box-shadow: 0 8rpx 24rpx rgba(255, 122, 89, 0.3);
+
+  &.disabled {
+    opacity: 0.6;
+  }
+}
