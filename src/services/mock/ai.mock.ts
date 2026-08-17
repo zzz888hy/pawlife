@@ -1,55 +1,98 @@
-import type { QuickReply } from '@/types';
+import type { QuickReply, PetAiContext } from '@/types';
 
 interface AiInitMsg {
   role: 'bot' | 'me';
   text: string;
 }
 
-export const mockAiInitMessages: AiInitMsg[] = [
-  {
-    role: 'bot',
-    text: '你好呀，我是豆豆的AI助手～ 🐶 我已经学习了豆豆826天的成长记录，知道它爱吃球、怕下雨、3岁了。有什么想聊的吗？',
-  },
-  {
-    role: 'bot',
-    text: '你可以问我："豆豆第一次吃什么？"、"豆豆最怕什么？"、"帮我写一篇豆豆的日记"',
-  },
-];
+export function buildAiInitMessages(petName: string): AiInitMsg[] {
+  return [
+    {
+      role: 'bot',
+      text: `你好呀，我是${petName}的AI助手～ 🤖 我已经学习了${petName}的宠物档案、成长/运动记录和日常动态，随时可以回答关于它的情况。`,
+    },
+    {
+      role: 'bot',
+      text: `你可以问我："${petName}最近做了什么？"、"${petName}的性格怎么样？"、"介绍一下${petName}"、"${petName}该注意什么健康问题？"`,
+    },
+  ];
+}
 
-export const mockQuickReplies: QuickReply[] = [
-  { text: '豆豆第一次吃什么？' },
-  { text: '豆豆最怕什么？' },
-  { text: '写一篇豆豆的日记' },
-  { text: '豆豆今天该打疫苗吗？' },
-];
+export function buildQuickReplies(petName: string): QuickReply[] {
+  return [
+    { text: `${petName}最近做了什么？` },
+    { text: `${petName}的性格怎么样？` },
+    { text: `介绍一下${petName}` },
+    { text: `${petName}该注意什么健康问题？` },
+  ];
+}
 
-const aiReplies: Record<string, string> = {
-  '豆豆第一次吃什么？':
-    '根据记录，豆豆第一次吃的是皇家幼犬粮，2021年5月8日，也就是它到家第2天。当时它还不太会用食盆，把粮食撒了一地🤣 后来慢慢学会了。它的食量从最初的30g/餐增长到现在180g/餐。',
-  '豆豆最怕什么？':
-    '根据成长记录分析，豆豆最怕的是：1️⃣ 下雨天（每次打雷都会钻到沙发底下）2️⃣ 吸尘器的声音 3️⃣ 兽医的白大褂。不过它最喜欢的是球、散步和你的怀抱 💛',
-  '写一篇豆豆的日记':
-    '【豆豆的日记 · 2024年7月19日】\n今天又是元气满满的一天！早上7点准时叫醒了铲屎官（他才不想起床呢哼）。散步时遇到了一只小柯基，我们互相闻了闻鼻子，是好朋友啦。下午啃了心爱的洁齿骨，吃了180g狗粮。晚上主人给我刷毛的时候，我幸福得差点睡着。这就是一只金毛完美的一天呀 🐾',
-  '豆豆今天该打疫苗吗？':
-    '💊 查看了豆豆的健康档案：狂犬疫苗和六联疫苗都已在2024.5.06完成，下次接种时间为2025.05.06。但【犬副流感】疫苗尚未接种，建议本月内安排。需要我帮你预约附近的宠物医院吗？',
-};
+export function getMockAiReply(query: string, context?: PetAiContext): string {
+  const name = context?.name || '宝贝';
+  const breed = context?.breed || '宠物';
+  const age = context?.age ? `${context.age}岁` : '';
+  const gender = context?.gender || '';
+  const personality = context?.personality || '';
+  const hobbies = context?.hobbies || '';
+  const records = context?.records || [];
+  const feeds = context?.feeds || [];
 
-export function getMockAiReply(query: string): string {
-  // Exact match
-  if (aiReplies[query]) {
-    return aiReplies[query];
+  const base = `${name}是${breed}${age ? '，' + age : ''}${gender ? '，' + gender : ''}`;
+
+  // 健康 / 疫苗
+  if (query.includes('疫苗') || query.includes('体检') || query.includes('健康') || query.includes('打针')) {
+    return `💊 ${base}。建议每年定期体检，狂犬疫苗和六联疫苗通常每年接种一次，快到接种时间记得提前预约哦～（具体可在「健康档案」查看）`;
   }
 
-  // Fuzzy match
-  if (query.includes('疫苗') || query.includes('体检') || query.includes('健康')) {
-    return '💊 我已查看豆豆的健康档案。建议定期体检，目前犬副流感疫苗待接种。详细情况可以打开健康档案查看哦～';
-  }
-  if (query.includes('故事') || query.includes('日记')) {
-    return '📖 我可以根据豆豆的成长记录生成专属故事！要不要现在就去"宠物故事"板块试试？多种风格任选～';
-  }
-  if (query.includes('吃') || query.includes('食')) {
-    return '根据记录，豆豆现在每天吃180g皇家成犬粮，分2餐。它最爱的是洁齿骨零食，但要注意控制量哦～避免贪吃变胖 🐶';
+  // 性格 / 习惯
+  if (query.includes('性格') || query.includes('怕') || query.includes('习惯') || query.includes('行为')) {
+    const pDesc = personality ? `根据档案，${name}性格「${personality}」。` : '';
+    return `🐾 ${pDesc}${hobbies ? `它平时的爱好是「${hobbies}」。` : ''}多陪它互动、记录它的日常，我就能帮你更了解它～`;
   }
 
-  return '关于豆豆，我还在持续学习中～试试问我它第一次吃什么、最怕什么，或者让我写一篇它的日记？我是基于豆豆826天成长记录训练的专属AI 🐾';
+  // 运动 / 活动 / 最近记录
+  if (query.includes('运动') || query.includes('活动') || query.includes('最近') || query.includes('做了什么') || query.includes('记录')) {
+    if (records.length > 0) {
+      const list = records.slice(0, 3).map((r) => `· ${r.date} ${r.title}：${r.desc}`).join('\n');
+      return `🏃 我翻了翻${name}的成长/运动记录，最近这些时刻值得回忆：\n${list}`;
+    }
+    return `🏃 关于${name}的活动记录我还在积累中～多带它出去运动、记录日常，我会慢慢更了解它。`;
+  }
+
+  // 日常动态表现
+  if (query.includes('动态') || query.includes('日常') || query.includes('发了') || query.includes('表现')) {
+    if (feeds.length > 0) {
+      const list = feeds.slice(0, 3).map((t) => `· ${t}`).join('\n');
+      return `📸 ${name}最近的日常动态有：\n${list}`;
+    }
+    return `📸 关于${name}的动态我还在积累中～在广场发布它的日常，我就能帮你总结它的表现啦。`;
+  }
+
+  // 饮食
+  if (query.includes('吃') || query.includes('食') || query.includes('零食')) {
+    const greedy = personality.includes('贪吃') ? '它档案里写着「贪吃」，要控制零食量哦～' : '';
+    return `🍖 ${base}。建议按品种和体重选择口粮、控制零食量。${greedy}`;
+  }
+
+  // 日记 / 故事
+  if (query.includes('日记') || query.includes('故事')) {
+    const recent = records[0];
+    return `📖 【${name}的日记】\n${name}是${breed}${age ? '，' + age : ''}。${hobbies ? `它最爱${hobbies}。` : ''}${recent ? `最近一次记录是「${recent.title}」——${recent.desc}。` : ''}这就是${name}美好的一天呀 🐾`;
+  }
+
+  // 介绍 / 情况
+  if (query.includes('介绍') || query.includes('情况') || query.includes('怎么样') || query.includes('档案')) {
+    const lines = [`🐶 ${name} · ${breed}${age ? ' · ' + age : ''}${gender ? ' · ' + gender : ''}`];
+    if (personality) lines.push(`性格：${personality}`);
+    if (hobbies) lines.push(`爱好：${hobbies}`);
+    if (records.length > 0) lines.push(`最近记录：${records[0].title}（${records[0].date}）`);
+    return lines.join('\n');
+  }
+
+  // 打招呼
+  if (query.includes('你好') || query.includes('hi') || query.includes('在吗') || query.includes('哈喽')) {
+    return `你好呀～我是${name}的AI助手，${base}。有什么想了解的都可以问我哦！`;
+  }
+
+  return `关于${name}（${breed}${age ? '，' + age : ''}），${personality ? `它性格「${personality}」，` : ''}${hobbies ? `爱好「${hobbies}」。` : ''}你可以问我它的性格、最近活动、日常动态、健康、饮食等，我会结合它的档案和记录回答～`;
 }

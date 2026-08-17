@@ -25,6 +25,41 @@ interface RawPet {
   createdAt?: string;
 }
 
+interface RawRecord {
+  _id: string;
+  petId: string;
+  date?: string;
+  title?: string;
+  desc?: string;
+  emoji?: string;
+  imageUrl?: string;
+  activityKey?: string;
+  createdAt?: string;
+}
+
+export interface AddRecordInput {
+  petId: string;
+  date: string;
+  title: string;
+  desc: string;
+  emoji: string;
+  imageUrl?: string;
+  activityKey?: string;
+}
+
+function toTimeline(raw: RawRecord): TimelineEntry {
+  return {
+    id: raw._id,
+    petId: raw.petId,
+    date: raw.date || '',
+    title: raw.title || raw.emoji || '记录',
+    desc: raw.desc || '',
+    emoji: raw.emoji || '🐾',
+    imageUrl: raw.imageUrl,
+    activityKey: raw.activityKey,
+  };
+}
+
 // 云数据库记录 → 前端 Pet 类型（_id → id）
 function toPet(raw: RawPet): Pet {
   return {
@@ -52,9 +87,16 @@ export async function fetchPetData(): Promise<{ pets: Pet[]; timeline: TimelineE
   }
 
   const list = await callCloudFunction<RawPet[]>('pet', { action: 'list' });
+  let timeline: TimelineEntry[] = [];
+  try {
+    const records = await callCloudFunction<RawRecord[]>('pet', { action: 'listRecords' });
+    timeline = (records || []).map(toTimeline);
+  } catch {
+    // listRecords 尚未部署或拉取失败时，不影响宠物列表展示
+  }
   return {
     pets: (list || []).map(toPet),
-    timeline: [], // 成长记录后续单独接，先返回空
+    timeline,
   };
 }
 
@@ -88,4 +130,16 @@ export async function updatePet(id: string, data: CreatePetInput): Promise<Pet> 
     data: { _id: id, ...data, avatar },
   });
   return toPet(raw);
+}
+
+export async function addRecord(data: AddRecordInput): Promise<TimelineEntry> {
+  if (MOCK_ENABLED) {
+    return { id: generateId(), ...data };
+  }
+
+  const raw = await callCloudFunction<RawRecord>('pet', {
+    action: 'addRecord',
+    data,
+  });
+  return toTimeline(raw);
 }

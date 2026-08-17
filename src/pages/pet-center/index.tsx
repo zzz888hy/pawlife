@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro';
 import { usePetStore } from '@/stores/usePetStore';
 import { useAppStore } from '@/stores/useAppStore';
 import { isImageUrl } from '@/utils/format';
+import { getDailyAiLine } from '@/utils/aiDaily';
 import TimelineItem from '@/components/TimelineItem';
 import SectionTitle from '@/components/SectionTitle';
 import CustomTabBar from '@/components/CustomTabBar';
@@ -51,6 +52,14 @@ export default function PetCenterPage() {
     Taro.navigateTo({ url: '/pages/sub-pages/timeline/index' });
   };
 
+  const handleOpenAiAssistant = () => {
+    Taro.navigateTo({ url: '/pages/sub-pages/ai-assistant/index' });
+  };
+
+  const handleQuickRecord = () => {
+    Taro.navigateTo({ url: '/pages/sub-pages/create-post/index?mode=record' });
+  };
+
   if (loading && pets.length === 0) {
     return (
       <View className='pet-center-page'>
@@ -78,6 +87,7 @@ export default function PetCenterPage() {
   }
 
   const currentTimeline = timeline.filter((t) => t.petId === currentPet.id).slice(0, 3);
+  const dailyLine = getDailyAiLine(currentPet, timeline.filter((t) => t.petId === currentPet.id));
 
   return (
     <View className='pet-center-page'>
@@ -111,6 +121,28 @@ export default function PetCenterPage() {
               <Text className='pet-hero-edit-text'>编辑档案 ✏️</Text>
             </View>
           </View>
+        </View>
+
+        {/* AI 每日一句 */}
+        <View className='ai-daily-card' onClick={handleOpenAiAssistant}>
+          <View className='ai-daily-icon'>
+            <Text>{dailyLine.icon}</Text>
+          </View>
+          <View className='ai-daily-body'>
+            <Text className='ai-daily-title'>{dailyLine.title}</Text>
+            <Text className='ai-daily-text'>{dailyLine.text}</Text>
+          </View>
+          <Text className='ai-daily-arrow'>›</Text>
+        </View>
+
+        {/* 快速记录 */}
+        <View className='quick-record-btn' onClick={handleQuickRecord}>
+          <Text className='quick-record-icon'>📝</Text>
+          <View className='quick-record-info'>
+            <Text className='quick-record-title'>快速记录</Text>
+            <Text className='quick-record-sub'>散步·喂食·玩耍，随手记一笔</Text>
+          </View>
+          <Text className='quick-record-arrow'>›</Text>
         </View>
 
         {/* Pet Switch Carousel */}

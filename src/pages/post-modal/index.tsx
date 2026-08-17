@@ -19,6 +19,14 @@ export default function PostModalPage() {
 
   const options: PostOption[] = [
     {
+      emoji: '📝',
+      title: '记录宠物',
+      desc: '散步·喂食·玩耍',
+      action: () => {
+        Taro.navigateTo({ url: '/pages/sub-pages/create-post/index?mode=record' });
+      },
+    },
+    {
       emoji: '📸',
       title: '发动态',
       desc: '分享日常照片',

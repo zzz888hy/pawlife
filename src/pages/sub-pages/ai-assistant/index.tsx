@@ -3,12 +3,16 @@ import { View, Text, Input, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import { useChatStore } from '@/stores/useChatStore';
 import { useAppStore } from '@/stores/useAppStore';
+import { usePetStore } from '@/stores/usePetStore';
 import SubPageHeader from '@/components/SubPageHeader';
 import './index.scss';
 
 export default function AiAssistantPage() {
   const { messages, quickReplies, sending, initChat, sendMessage } = useChatStore();
   const { showToast } = useAppStore();
+  const pets = usePetStore((s) => s.pets);
+  const currentPetId = usePetStore((s) => s.currentPetId);
+  const currentPetName = (pets.find((p) => p.id === currentPetId) || pets[0])?.name || '宝贝';
   const [inputValue, setInputValue] = useState('');
   const scrollViewRef = useRef<any>(null);
   const bottomRef = useRef<any>(null);
@@ -68,7 +72,7 @@ export default function AiAssistantPage() {
                 <Text className='ai-head-vip-text'>PRO</Text>
               </View>
             </View>
-            <Text className='ai-head-subtitle'>基于豆豆的专属记忆模型</Text>
+            <Text className='ai-head-subtitle'>基于{currentPetName}的专属记忆模型</Text>
           </View>
         </View>
       </View>

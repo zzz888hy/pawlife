@@ -13,7 +13,7 @@ exports.main = async (event) => {
   const { action, data } = event || {};
 
   const pets = db.collection('pets');
-  const records = db.collection('pet_records');
+  const records = db.collection('pets_records');
   const users = db.collection('users');
 
   switch (action) {
@@ -44,6 +44,11 @@ exports.main = async (event) => {
 
     case 'timeline': {
       const res = await records.where({ petId: data.petId }).orderBy('createdAt', 'desc').get();
+      return { code: 0, data: res.data };
+    }
+
+    case 'listRecords': {
+      const res = await records.where({ openid: OPENID }).orderBy('createdAt', 'desc').get();
       return { code: 0, data: res.data };
     }
 

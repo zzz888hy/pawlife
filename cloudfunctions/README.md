@@ -38,7 +38,7 @@ cloudfunctions/
 |---|---|---|
 | users | openid, nickname, avatarUrl, coins, isVip, petCount, recordCount | 用户 |
 | pets | openid, name, type, breed, avatar, birthday, gender, personality, hobbies, photos | 宠物 |
-| pet_records | openid, petId, type, content, images | 成长记录 |
+| pets_records | openid, petId, type, content, images | 成长记录 |
 | feed | openid, pet, petName, breed, txt, tags, images, category, likeOpenids, commentCount | 动态 |
 | comments | openid, feedId, content, userName, avatar | 评论 |
 | tasks | openid, taskId, completed, date | 任务完成记录 |

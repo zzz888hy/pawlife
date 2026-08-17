@@ -1,5 +1,6 @@
-import { View, Text } from '@tarojs/components';
+import { View, Text, Image } from '@tarojs/components';
 import type { TimelineEntry } from '@/types';
+import { isImageUrl } from '@/utils/format';
 import './index.scss';
 
 interface TimelineItemProps {
@@ -8,6 +9,7 @@ interface TimelineItemProps {
 }
 
 export default function TimelineItem({ item, isLast }: TimelineItemProps) {
+  const hasImage = !!item.imageUrl && isImageUrl(item.imageUrl);
   return (
     <View className='tl-item'>
       <View className='tl-dot-col'>
@@ -19,7 +21,11 @@ export default function TimelineItem({ item, isLast }: TimelineItemProps) {
         <Text className='tl-title'>{item.emoji} {item.title}</Text>
         <Text className='tl-desc'>{item.desc}</Text>
         <View className='tl-img'>
-          <Text>{item.emoji}</Text>
+          {hasImage ? (
+            <Image className='tl-img-img' src={item.imageUrl!} mode='aspectFill' />
+          ) : (
+            <Text>{item.emoji}</Text>
+          )}
         </View>
       </View>
     </View>

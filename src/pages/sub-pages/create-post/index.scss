@@ -205,3 +205,89 @@
   font-weight: 700;
   box-shadow: 0 8rpx 24rpx rgba(255, 122, 89, 0.3);
 }
+
+// 草稿恢复横幅
+.cp-draft-banner {
+  margin: 20rpx 24rpx 0;
+  background: #FFF4E6;
+  border: 2rpx solid #FFD9A8;
+  border-radius: 16rpx;
+  padding: 20rpx 24rpx;
+  font-size: 26rpx;
+  color: #B06A1F;
+}
+
+// 发布目标
+.cp-targets {
+  display: flex;
+  gap: 16rpx;
+}
+
+.cp-target {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 12rpx;
+  border: 2rpx solid #F0E8E0;
+  border-radius: 20rpx;
+  transition: all 0.2s;
+
+  &.active {
+    border-color: #FF7A59;
+    background: #FFF0EA;
+  }
+}
+
+.cp-target-label {
+  display: block;
+  font-size: 28rpx;
+  font-weight: 600;
+  color: #4A4238;
+}
+
+.cp-target-desc {
+  display: block;
+  font-size: 22rpx;
+  color: #9B958E;
+  margin-top: 6rpx;
+}
+
+.cp-target.active .cp-target-label {
+  color: #FF7A59;
+}
+
+// 活动类型
+.cp-activities {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16rpx;
+}
+
+.cp-activity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+  padding: 20rpx 8rpx;
+  border: 2rpx solid #F0E8E0;
+  border-radius: 20rpx;
+  transition: all 0.2s;
+
+  &.active {
+    border-color: #FF7A59;
+    background: #FFF0EA;
+  }
+}
+
+.cp-activity-emoji {
+  font-size: 44rpx;
+}
+
+.cp-activity-label {
+  font-size: 24rpx;
+  color: #4A4238;
+}
+
+.cp-activity.active .cp-activity-label {
+  color: #FF7A59;
+  font-weight: 600;
+}

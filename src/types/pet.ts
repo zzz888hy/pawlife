@@ -23,6 +23,7 @@ export interface TimelineEntry {
   desc: string;
   emoji: string;
   imageUrl?: string;
+  activityKey?: string; // 记录活动类型（散步/喂食/…），预留统计用
 }
 
 export interface CreatePetInput {
