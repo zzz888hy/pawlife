@@ -1,0 +1,73 @@
+.user-feed-page {
+  min-height: 100vh;
+  background: #FFF8F3;
+}
+
+.uf-scroll {
+  height: calc(100vh - 96rpx);
+}
+
+.uf-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40rpx 24rpx 24rpx;
+}
+
+.uf-avatar {
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #FFF0EA;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.uf-avatar-img {
+  width: 100%;
+  height: 100%;
+}
+
+.uf-avatar-emoji {
+  font-size: 72rpx;
+}
+
+.uf-name {
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #2D2A26;
+  margin-top: 16rpx;
+}
+
+.uf-sub {
+  font-size: 24rpx;
+  color: #9B958E;
+  margin-top: 8rpx;
+}
+
+.uf-list {
+  padding-bottom: 24rpx;
+}
+
+.uf-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 100rpx 0;
+}
+
+.uf-empty-icon {
+  font-size: 88rpx;
+}
+
+.uf-empty-text {
+  font-size: 26rpx;
+  color: #9B958E;
+  margin-top: 20rpx;
+}
+
+.uf-bottom-safe {
+  height: 40rpx;
+}

@@ -255,6 +255,30 @@
   color: #FF7A59;
 }
 
+// 谁可以看
+.cp-visibilities {
+  display: flex;
+  gap: 16rpx;
+}
+
+.cp-visibility {
+  flex: 1;
+  text-align: center;
+  padding: 20rpx 12rpx;
+  border: 2rpx solid #F0E8E0;
+  border-radius: 20rpx;
+  font-size: 26rpx;
+  color: #4A4238;
+  transition: all 0.2s;
+
+  &.active {
+    border-color: #FF7A59;
+    background: #FFF0EA;
+    color: #FF7A59;
+    font-weight: 600;
+  }
+}
+
 // 活动类型
 .cp-activities {
   display: grid;

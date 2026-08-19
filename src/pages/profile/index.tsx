@@ -8,6 +8,8 @@ import CustomTabBar from '@/components/CustomTabBar';
 import './index.scss';
 
 const MENU_SECTION_1 = [
+  { key: 'myposts', label: '我的动态', icon: '📝', url: '/pages/sub-pages/my-posts/index' },
+  { key: 'myrecords', label: '个人记录', icon: '🗂️', url: '/pages/sub-pages/my-records/index' },
   { key: 'messages', label: '消息中心', icon: '🔔', url: '/pages/sub-pages/messages/index' },
   { key: 'vip', label: 'Pro会员', icon: '👑', url: '/pages/sub-pages/vip-membership/index' },
   { key: 'orders', label: '我的订单', icon: '📦', url: '/pages/sub-pages/orders/index' },

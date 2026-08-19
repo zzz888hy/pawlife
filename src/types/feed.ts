@@ -1,3 +1,5 @@
+export type FeedVisibility = 'public' | 'friends' | 'private';
+
 export interface FeedItem {
   id: string;
   pet: string;          // emoji
@@ -5,7 +7,7 @@ export interface FeedItem {
   breed: string;
   age: string;
   owner: string;
-  ownerId: string;
+  ownerId: string;      // 作者 openid
   ownerAvatar: string;  // 主人头像（emoji 或图片路径）
   time: string;
   bg: string;           // gradient background
@@ -19,6 +21,7 @@ export interface FeedItem {
   liked: boolean;
   collected: boolean;
   category: string;
+  visibility?: FeedVisibility;  // 公开/好友/仅自己可见
 }
 
 export interface Comment {

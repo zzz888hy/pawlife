@@ -45,6 +45,12 @@ export default function SearchPage() {
     Taro.navigateTo({ url: `/pages/sub-pages/feed-detail/index?feedId=${id}` });
   };
 
+  const handleOpenOwner = (item: any) => {
+    Taro.navigateTo({
+      url: `/pages/sub-pages/user-feed/index?ownerId=${item.ownerId}&ownerName=${encodeURIComponent(item.owner)}&ownerAvatar=${encodeURIComponent(item.ownerAvatar)}`,
+    });
+  };
+
   return (
     <View className='search-page'>
       <SubPageHeader title='搜索' />
@@ -100,6 +106,7 @@ export default function SearchPage() {
                 onCollect={handleCollect}
                 onComment={handleComment}
                 onOpen={() => handleOpen(item.id)}
+                onOpenOwner={() => handleOpenOwner(item)}
               />
             ))}
           </View>

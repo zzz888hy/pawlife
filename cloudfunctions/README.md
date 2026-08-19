@@ -8,8 +8,8 @@
 cloudfunctions/
   login/       # 登录（拿 openid，建/查用户）
   user/        # 用户信息（getProfile/updateProfile/addCoins/setVip）
-  pet/         # 宠物 CRUD + 成长记录
-  feed/        # 动态广场（list/create/like/comment/listComments）
+  pet/         # 宠物 CRUD + 成长记录（addRecord/listRecords/timeline/updateRecord/removeRecord）
+  feed/        # 动态广场（list/create/update/remove/listMine/listByUser/like/comment/listComments）
   task/        # 每日任务（list/complete）
   product/     # 商品（list/categories/create）
   order/       # 购物车/订单（cartAdd/cartList/cartRemove/cartClear/create/list/updateStatus）
@@ -39,7 +39,7 @@ cloudfunctions/
 | users | openid, nickname, avatarUrl, coins, isVip, petCount, recordCount | 用户 |
 | pets | openid, name, type, breed, avatar, birthday, gender, personality, hobbies, photos | 宠物 |
 | pets_records | openid, petId, type, content, images | 成长记录 |
-| feed | openid, pet, petName, breed, txt, tags, images, category, likeOpenids, commentCount | 动态 |
+| feed | openid, pet, petName, breed, txt, tags, images, category, likeOpenids, commentCount, visibility | 动态（visibility: public/friends/private，默认 public） |
 | comments | openid, feedId, content, userName, avatar | 评论 |
 | tasks | openid, taskId, completed, date | 任务完成记录 |
 | categories | name, emoji, sort | 商品分类 |

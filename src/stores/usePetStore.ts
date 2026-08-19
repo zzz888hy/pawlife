@@ -5,6 +5,8 @@ import {
   createPet as createPetApi,
   updatePet as updatePetApi,
   addRecord as addRecordApi,
+  updateRecord as updateRecordApi,
+  removeRecord as removeRecordApi,
   type AddRecordInput,
 } from '@/services/pet';
 
@@ -18,6 +20,8 @@ interface PetState {
   createPet: (data: CreatePetInput) => Promise<void>;
   updatePet: (petId: string, data: CreatePetInput) => Promise<void>;
   addRecord: (data: AddRecordInput) => Promise<void>;
+  updateRecord: (id: string, data: AddRecordInput) => Promise<void>;
+  removeRecord: (id: string) => Promise<void>;
   getCurrentPet: () => Pet | null;
 }
 
@@ -63,6 +67,18 @@ export const usePetStore = create<PetState>((set, get) => ({
   addRecord: async (data: AddRecordInput) => {
     const entry = await addRecordApi(data);
     set((s) => ({ timeline: [entry, ...s.timeline] }));
+  },
+
+  updateRecord: async (id, data) => {
+    await updateRecordApi(id, data);
+    set((s) => ({
+      timeline: s.timeline.map((t) => (t.id === id ? { ...t, ...data } : t)),
+    }));
+  },
+
+  removeRecord: async (id) => {
+    await removeRecordApi(id);
+    set((s) => ({ timeline: s.timeline.filter((t) => t.id !== id) }));
   },
 
   getCurrentPet: () => {

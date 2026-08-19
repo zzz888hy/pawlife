@@ -60,6 +60,31 @@ exports.main = async (event) => {
       return { code: 0, data: { _id: addRes._id, ...rec } };
     }
 
+    case 'updateRecord': {
+      const { _id, ...patch } = data || {};
+      const doc = await records.doc(_id).get();
+      if (doc.data.openid !== OPENID) {
+        return { code: 403, message: '无权操作' };
+      }
+      const upd = {};
+      ['petId', 'title', 'desc', 'emoji', 'date', 'imageUrl', 'activityKey'].forEach((k) => {
+        if (patch[k] !== undefined) upd[k] = patch[k];
+      });
+      upd.updatedAt = db.serverDate();
+      await records.doc(_id).update({ data: upd });
+      return { code: 0, data: { _id, ...upd } };
+    }
+
+    case 'removeRecord': {
+      const doc = await records.doc(data._id).get();
+      if (doc.data.openid !== OPENID) {
+        return { code: 403, message: '无权操作' };
+      }
+      await records.doc(data._id).remove();
+      await users.where({ openid: OPENID }).update({ data: { recordCount: _.inc(-1) } });
+      return { code: 0, data: { removed: true } };
+    }
+
     default:
       return { code: 400, message: '未知操作' };
   }

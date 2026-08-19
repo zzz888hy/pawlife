@@ -143,3 +143,13 @@ export async function addRecord(data: AddRecordInput): Promise<TimelineEntry> {
   });
   return toTimeline(raw);
 }
+
+export async function updateRecord(id: string, data: AddRecordInput): Promise<void> {
+  if (MOCK_ENABLED) return;
+  await callCloudFunction('pet', { action: 'updateRecord', data: { _id: id, ...data } });
+}
+
+export async function removeRecord(id: string): Promise<void> {
+  if (MOCK_ENABLED) return;
+  await callCloudFunction('pet', { action: 'removeRecord', data: { _id: id } });
+}

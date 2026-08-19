@@ -9,15 +9,20 @@ interface FeedItemProps {
   onCollect: (id: string) => void;
   onComment: (id: string) => void;
   onOpen: () => void;
+  onOpenOwner?: () => void;
 }
 
-export default function FeedItem({ item, onLike, onCollect, onComment, onOpen }: FeedItemProps) {
+export default function FeedItem({ item, onLike, onCollect, onComment, onOpen, onOpenOwner }: FeedItemProps) {
   const imgs = item.images && item.images.length > 0 ? item.images : null;
   return (
     <View className='feed-item' onClick={onOpen}>
       {/* Header */}
       <View className='feed-head'>
-        <View className='feed-avatar' style={{ background: item.bg }}>
+        <View
+          className='feed-avatar'
+          style={{ background: item.bg }}
+          onClick={(e) => { e.stopPropagation(); onOpenOwner?.(); }}
+        >
           {isImageUrl(item.ownerAvatar) ? (
             <Image className='feed-avatar-img' src={item.ownerAvatar} mode='aspectFill' />
           ) : (
@@ -32,21 +37,14 @@ export default function FeedItem({ item, onLike, onCollect, onComment, onOpen }:
         </View>
       </View>
 
-      {/* Photos */}
-      {imgs && imgs.length >= 2 ? (
-        <View className='feed-pics two'>
-          <View className='feed-pic' style={{ background: item.bg }}>
-            <Image className='feed-pic-img' src={imgs[0]} mode='aspectFill' />
-          </View>
-          <View className='feed-pic' style={{ background: item.bg }}>
-            <Image className='feed-pic-img' src={imgs[1]} mode='aspectFill' />
-          </View>
-        </View>
-      ) : imgs && imgs.length === 1 ? (
-        <View className='feed-pics one'>
-          <View className='feed-pic feed-pic--large' style={{ background: item.bg }}>
-            <Image className='feed-pic-img' src={imgs[0]} mode='aspectFill' />
-          </View>
+      {/* Photos：4 张 → 2×2；其余 → 每行 3 张往下排（9 张即 3×3 九宫格） */}
+      {imgs && imgs.length > 0 ? (
+        <View className={`feed-pics grid cols-${imgs.length === 4 ? 2 : 3}`}>
+          {imgs.map((img, i) => (
+            <View key={i} className='feed-pic' style={{ background: item.bg }}>
+              <Image className='feed-pic-img' src={img} mode='aspectFill' />
+            </View>
+          ))}
         </View>
       ) : item.pics === 2 ? (
         <View className='feed-pics two'>

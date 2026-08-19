@@ -4,7 +4,10 @@ import {
   fetchFeed as fetchFeedApi,
   createFeed as createFeedApi,
   toggleLike as toggleLikeApi,
+  updateFeed as updateFeedApi,
+  removeFeed as removeFeedApi,
   type CreateFeedData,
+  type UpdateFeedInput,
 } from '@/services/feed';
 
 const SORT_TABS = ['推荐', '摸摸最多'];
@@ -41,6 +44,8 @@ interface FeedState {
   toggleLike: (feedId: string) => void;
   toggleCollect: (feedId: string) => void;
   incrementCmts: (feedId: string) => void;
+  updateFeed: (feedId: string, patch: UpdateFeedInput) => Promise<void>;
+  removeFeed: (feedId: string) => Promise<void>;
   setCategory: (cat: string) => void;
 }
 
@@ -87,6 +92,20 @@ export const useFeedStore = create<FeedState>((set) => ({
         f.id === feedId ? { ...f, cmts: f.cmts + 1 } : f
       ),
     }));
+  },
+
+  updateFeed: async (feedId, patch) => {
+    await updateFeedApi(feedId, patch);
+    set((s) => ({
+      feedItems: s.feedItems.map((f) =>
+        f.id === feedId ? { ...f, ...patch } : f
+      ),
+    }));
+  },
+
+  removeFeed: async (feedId) => {
+    await removeFeedApi(feedId);
+    set((s) => ({ feedItems: s.feedItems.filter((f) => f.id !== feedId) }));
   },
 
   setCategory: (cat) => set({ activeCategory: cat }),

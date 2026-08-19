@@ -58,6 +58,12 @@ export default function HallPage() {
     Taro.navigateTo({ url: `/pages/sub-pages/feed-detail/index?feedId=${id}` });
   };
 
+  const handleOpenOwner = (item: any) => {
+    Taro.navigateTo({
+      url: `/pages/sub-pages/user-feed/index?ownerId=${item.ownerId}&ownerName=${encodeURIComponent(item.owner)}&ownerAvatar=${encodeURIComponent(item.ownerAvatar)}`,
+    });
+  };
+
   const handleRankClick = () => {
     Taro.navigateTo({ url: '/pages/sub-pages/rank/index' });
   };
@@ -166,6 +172,7 @@ export default function HallPage() {
               onCollect={handleCollect}
               onComment={handleComment}
               onOpen={() => handleOpen(item.id)}
+              onOpenOwner={() => handleOpenOwner(item)}
             />
           ))
         )}

@@ -61,6 +61,23 @@
 .feed-pics {
   gap: 4rpx;
 
+  &.grid {
+    display: grid;
+    padding: 0 28rpx 24rpx;
+
+    &.cols-2 {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    &.cols-3 {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .feed-pic {
+      aspect-ratio: 1;
+    }
+  }
+
   &.one {
     padding: 0 28rpx 24rpx;
   }
@@ -78,6 +95,7 @@
   justify-content: center;
   font-size: 120rpx;
   border-radius: 24rpx;
+  overflow: hidden;
 
   &--large {
     width: 100%;

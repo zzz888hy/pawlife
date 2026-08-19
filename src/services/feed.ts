@@ -1,7 +1,7 @@
 /**
  * 动态/评论服务层：列表 / 发布 / 点赞 / 评论
  */
-import type { FeedItem, Comment } from '@/types';
+import type { FeedItem, Comment, FeedVisibility } from '@/types';
 import { MOCK_ENABLED } from './mock';
 import { mockFeedItems } from './mock/feed.mock';
 import { mockComments } from './mock/comment.mock';
@@ -10,6 +10,7 @@ import { generateId } from '@/utils/format';
 
 interface RawFeed {
   _id: string;
+  openid?: string;
   pet: string;
   petName: string;
   breed: string;
@@ -22,6 +23,7 @@ interface RawFeed {
   likes: number;
   cmts: number;
   liked: boolean;
+  visibility?: FeedVisibility;
   createdAt?: string;
 }
 
@@ -43,6 +45,14 @@ export interface CreateFeedData {
   tags: string[];
   images: string[];
   category: string;
+  visibility?: FeedVisibility;
+}
+
+export interface UpdateFeedInput {
+  txt?: string;
+  tags?: string[];
+  images?: string[];
+  visibility?: FeedVisibility;
 }
 
 const BG_GRADIENTS = [
@@ -79,7 +89,7 @@ function toFeed(raw: RawFeed): FeedItem {
     breed: raw.breed,
     age: '',
     owner: raw.owner || '@宠物主人',
-    ownerId: 'me',
+    ownerId: raw.openid || 'me',
     ownerAvatar: raw.ownerAvatar || raw.pet,
     time: formatRelativeTime(raw.createdAt),
     bg: pickBg(raw._id),
@@ -93,6 +103,7 @@ function toFeed(raw: RawFeed): FeedItem {
     liked: raw.liked,
     collected: false,
     category: raw.category,
+    visibility: raw.visibility || 'public',
   };
 }
 
@@ -138,6 +149,7 @@ export async function createFeed(data: CreateFeedData): Promise<FeedItem> {
       liked: false,
       collected: false,
       category: data.category,
+      visibility: data.visibility || 'public',
     };
   }
 
@@ -151,9 +163,32 @@ export async function createFeed(data: CreateFeedData): Promise<FeedItem> {
       tags: data.tags,
       images: data.images,
       category: data.category,
+      visibility: data.visibility || 'public',
     },
   });
   return toFeed(raw);
+}
+
+export async function updateFeed(feedId: string, patch: UpdateFeedInput): Promise<void> {
+  if (MOCK_ENABLED) return;
+  await callCloudFunction('feed', { action: 'update', data: { feedId, ...patch } });
+}
+
+export async function removeFeed(feedId: string): Promise<void> {
+  if (MOCK_ENABLED) return;
+  await callCloudFunction('feed', { action: 'remove', data: { feedId } });
+}
+
+export async function listMyFeed(): Promise<FeedItem[]> {
+  if (MOCK_ENABLED) return [...mockFeedItems];
+  const list = await callCloudFunction<RawFeed[]>('feed', { action: 'listMine' });
+  return (list || []).map(toFeed);
+}
+
+export async function listFeedByUser(openid: string): Promise<FeedItem[]> {
+  if (MOCK_ENABLED) return [...mockFeedItems];
+  const list = await callCloudFunction<RawFeed[]>('feed', { action: 'listByUser', data: { openid } });
+  return (list || []).map(toFeed);
 }
 
 export async function toggleLike(feedId: string): Promise<void> {

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { View, Text, Textarea, Image } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import { useFeedStore } from '@/stores/useFeedStore';
@@ -8,6 +8,7 @@ import { useDraftStore } from '@/stores/useDraftStore';
 import { chooseImage, uploadFile } from '@/services/cloud';
 import { addUserCoins } from '@/services/auth';
 import { isImageUrl } from '@/utils/format';
+import type { FeedVisibility } from '@/types';
 import {
   ACTIVITY_TYPES,
   PUBLISH_TARGETS,
@@ -25,9 +26,16 @@ const PUBLISH_LABELS: Record<PublishTarget, string> = {
   draft: '💾 存草稿',
 };
 
+const VISIBILITY_OPTIONS: { key: FeedVisibility; label: string }[] = [
+  { key: 'public', label: '🌍 公开' },
+  { key: 'friends', label: '👥 好友可见' },
+  { key: 'private', label: '🔒 仅自己可见' },
+];
+
 export default function CreatePostPage() {
   const router = useRouter();
   const mode = (router.params?.mode as string) || '';
+  const editId = (router.params?.editId as string) || '';
 
   const [text, setText] = useState('');
   const [images, setImages] = useState<string[]>([]);
@@ -35,6 +43,8 @@ export default function CreatePostPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [activityKey, setActivityKey] = useState('');
   const [target, setTarget] = useState<PublishTarget>(mode === 'record' ? 'record' : 'feed');
+  const [visibility, setVisibility] = useState<FeedVisibility>('public');
+  const [editDate, setEditDate] = useState('');
   const [publishing, setPublishing] = useState(false);
   const [aiCaption, setAiCaption] = useState('');
   const [aiLoading, setAiLoading] = useState(false);
@@ -43,7 +53,12 @@ export default function CreatePostPage() {
     Taro.showToast({ title: text, icon });
   };
   const addFeed = useFeedStore((s) => s.addFeed);
+  const updateFeed = useFeedStore((s) => s.updateFeed);
+  const feedItems = useFeedStore((s) => s.feedItems);
+  const fetchFeed = useFeedStore((s) => s.fetchFeed);
   const addRecord = usePetStore((s) => s.addRecord);
+  const updateRecord = usePetStore((s) => s.updateRecord);
+  const timeline = usePetStore((s) => s.timeline);
   const addCoins = useUserStore((s) => s.addCoins);
   const pets = usePetStore((s) => s.pets);
   const fetchPets = usePetStore((s) => s.fetchPets);
@@ -53,20 +68,49 @@ export default function CreatePostPage() {
   const removeDraft = useDraftStore((s) => s.removeDraft);
 
   const maxImages = target === 'record' ? 1 : 9;
+  const prefilled = useRef(false);
 
   useEffect(() => {
-    if (pets.length === 0) fetchPets();
+    if (pets.length === 0 || editId) fetchPets();
+    if (editId && mode !== 'record') fetchFeed();
     loadDrafts();
   }, []);
 
+  // 编辑模式：从 store 回填数据
+  useEffect(() => {
+    if (!editId || prefilled.current) return;
+    if (mode === 'record') {
+      if (timeline.length === 0) return;
+      const rec = timeline.find((t) => t.id === editId);
+      if (!rec) return;
+      setActivityKey(rec.activityKey || '');
+      setText(rec.activityKey ? rec.desc || '' : rec.desc || rec.title || '');
+      if (rec.imageUrl) setImages([rec.imageUrl]);
+      setSelectedPetId(rec.petId || '');
+      setEditDate(rec.date || '');
+      setTarget('record');
+      prefilled.current = true;
+    } else {
+      if (feedItems.length === 0) return;
+      const f = feedItems.find((x) => x.id === editId);
+      if (!f) return;
+      setText(f.txt || '');
+      setSelectedTags(f.tags || []);
+      setImages(f.images || []);
+      setVisibility(f.visibility || 'public');
+      setTarget('feed');
+      prefilled.current = true;
+    }
+  }, [editId, mode, timeline, feedItems]);
+
   useEffect(() => {
     const titles: Record<PublishTarget, string> = {
-      record: '记录宠物',
-      feed: '发布动态',
+      record: editId ? '编辑记录' : '记录宠物',
+      feed: editId ? '编辑动态' : '发布动态',
       draft: '存草稿',
     };
     Taro.setNavigationBarTitle({ title: titles[target] });
-  }, [target]);
+  }, [target, editId]);
 
   // 选中的宠物：优先按 id 找，找不到则回退到第一只
   const selectedPet = pets.find((p) => p.id === selectedPetId) || pets[0];
@@ -141,13 +185,22 @@ export default function CreatePostPage() {
     showToast('已恢复草稿', 'success');
   };
 
-  // 发布 / 记录 / 存草稿
+  // 图片处理：本地临时路径需上传，remote（http/https/cloud:///data:）原样保留
+  const isRemoteUrl = (img: string) =>
+    img.startsWith('http') || img.startsWith('cloud://') || img.startsWith('data:');
+
+  const resolveImageUrl = async (img: string, cloudPath: string): Promise<string> => {
+    if (isRemoteUrl(img)) return img;
+    return uploadFile(img, cloudPath);
+  };
+
+  // 发布 / 记录 / 存草稿 / 保存修改
   const handlePublish = async () => {
     const activity = getActivity(activityKey);
     const hasText = !!text.trim();
     const hasImage = images.length > 0;
 
-    // 存草稿：本地保存后返回
+    // 存草稿：本地保存后返回（仅新建时）
     if (target === 'draft') {
       if (!activity && !hasText && !hasImage) {
         showToast('请先选择活动或写点内容');
@@ -176,25 +229,31 @@ export default function CreatePostPage() {
       try {
         let imageUrl: string | undefined;
         if (images.length > 0) {
-          imageUrl = await uploadFile(images[0], `records/${Date.now()}.jpg`);
+          imageUrl = await resolveImageUrl(images[0], `records/${Date.now()}.jpg`);
         }
-        await addRecord({
+        const recordData = {
           petId: selectedPet?.id || '',
-          date: todayStr(),
+          date: editId ? editDate || todayStr() : todayStr(),
           title: activity ? activity.label : text.trim().slice(0, 20) || '随手记录',
           desc: activity ? text.trim() : '',
           emoji: activity?.emoji || '🐾',
           imageUrl,
           activityKey: activity?.key,
-        });
-        showToast('已记录 🐾', 'success');
+        };
+        if (editId) {
+          await updateRecord(editId, recordData);
+          showToast('已保存修改', 'success');
+        } else {
+          await addRecord(recordData);
+          showToast('已记录 🐾', 'success');
+        }
         setTimeout(() => Taro.navigateBack(), 800);
       } catch (err) {
-        console.error('[addRecord]', err);
+        console.error('[record]', err);
         const raw = String((err as any)?.errMsg || (err as any)?.message || '未知错误');
         let hint = '';
         if (raw.includes('collection') || raw.includes('ResourceNotFound') || raw.includes('集合')) {
-          hint = '集合名可能对不上，代码里用的是 pet_records（带下划线）。';
+          hint = '集合名可能对不上，代码里用的是 pets_records（带下划线）。';
         } else if (raw.includes('FunctionName') || raw.includes('not exist') || raw.includes('不存在')) {
           hint = 'pet 云函数可能没部署，请右键 cloudfunctions/pet 上传部署。';
         }
@@ -218,8 +277,7 @@ export default function CreatePostPage() {
     try {
       const uploadedUrls: string[] = [];
       for (let i = 0; i < images.length; i++) {
-        const cloudPath = `feeds/${Date.now()}_${i}.jpg`;
-        uploadedUrls.push(await uploadFile(images[i], cloudPath));
+        uploadedUrls.push(await resolveImageUrl(images[i], `feeds/${Date.now()}_${i}.jpg`));
       }
 
       let finalText = hasText ? text.trim() : uploadedUrls.length > 0 ? '分享照片 📸' : '';
@@ -228,93 +286,107 @@ export default function CreatePostPage() {
       }
       const tags = activity ? [`#${activity.label}`, ...selectedTags] : selectedTags;
 
-      addFeed({
-        petName: selectedPet?.name || '宝贝',
-        petEmoji: selectedPet?.avatar || '🐾',
-        breed: selectedPet?.breed || '',
-        text: finalText,
-        tags,
-        images: uploadedUrls,
-        category: tags.length > 0 ? tags[0].replace('#', '') : '推荐',
-      });
-      addCoins(5);                 // 本地即时 +5
-      addUserCoins(5).catch(() => {});  // 后端持久化
-      Taro.showToast({ title: '发布成功！+5 金币', icon: 'success' });
-      setTimeout(() => Taro.navigateBack(), 1500);
+      if (editId) {
+        await updateFeed(editId, { txt: finalText, tags, images: uploadedUrls, visibility });
+        showToast('已保存修改', 'success');
+      } else {
+        addFeed({
+          petName: selectedPet?.name || '宝贝',
+          petEmoji: selectedPet?.avatar || '🐾',
+          breed: selectedPet?.breed || '',
+          text: finalText,
+          tags,
+          images: uploadedUrls,
+          category: tags.length > 0 ? tags[0].replace('#', '') : '推荐',
+          visibility,
+        });
+        addCoins(5);                 // 本地即时 +5
+        addUserCoins(5).catch(() => {});  // 后端持久化
+        Taro.showToast({ title: '发布成功！+5 金币', icon: 'success' });
+      }
+      setTimeout(() => Taro.navigateBack(), editId ? 800 : 1500);
     } catch (err) {
-      showToast('发布失败，请重试');
+      showToast(editId ? '保存失败，请重试' : '发布失败，请重试');
     } finally {
       setPublishing(false);
     }
   };
 
+  const publishLabel = editId ? '💾 保存修改' : PUBLISH_LABELS[target];
+
   return (
     <View className='create-post-page'>
-      {/* 草稿恢复横幅 */}
-      {drafts.length > 0 && (
+      {/* 草稿恢复横幅（仅新建时） */}
+      {!editId && drafts.length > 0 && (
         <View className='cp-draft-banner' onClick={handleRestoreDraft}>
           <Text>📝 你有 {drafts.length} 篇草稿，点击恢复最近一篇</Text>
         </View>
       )}
 
-      {/* 发布目标 */}
-      <View className='cp-section'>
-        <Text className='cp-label'>发布目标</Text>
-        <View className='cp-targets'>
-          {PUBLISH_TARGETS.map((t) => (
-            <View
-              key={t.key}
-              className={`cp-target ${target === t.key ? 'active' : ''}`}
-              onClick={() => setTarget(t.key)}
-            >
-              <Text className='cp-target-label'>{t.label}</Text>
-              <Text className='cp-target-desc'>{t.desc}</Text>
-            </View>
-          ))}
-        </View>
-      </View>
-
-      {/* 选择宠物 */}
-      <View className='cp-section'>
-        <Text className='cp-label'>选择宠物</Text>
-        <View className='cp-pet-options'>
-          {pets.length > 0 ? (
-            pets.map((pet) => (
+      {/* 发布目标（仅新建时） */}
+      {!editId && (
+        <View className='cp-section'>
+          <Text className='cp-label'>发布目标</Text>
+          <View className='cp-targets'>
+            {PUBLISH_TARGETS.map((t) => (
               <View
-                key={pet.id}
-                className={`cp-pet-btn ${selectedPet?.id === pet.id ? 'active' : ''}`}
-                onClick={() => setSelectedPetId(pet.id)}
+                key={t.key}
+                className={`cp-target ${target === t.key ? 'active' : ''}`}
+                onClick={() => setTarget(t.key)}
               >
-                  {isImageUrl(pet.avatar) ? (
-                    <Image className='cp-pet-avatar' src={pet.avatar} mode='aspectFill' />
-                  ) : (
-                    <Text>{pet.avatar}</Text>
-                  )}
-                  <Text>{pet.name}</Text>
+                <Text className='cp-target-label'>{t.label}</Text>
+                <Text className='cp-target-desc'>{t.desc}</Text>
               </View>
-            ))
-          ) : (
-            <Text className='cp-no-pet'>暂无宠物，请先创建</Text>
-          )}
+            ))}
+          </View>
         </View>
-      </View>
+      )}
 
-      {/* 活动类型 */}
-      <View className='cp-section'>
-        <Text className='cp-label'>记录活动（可选）</Text>
-        <View className='cp-activities'>
-          {ACTIVITY_TYPES.map((a) => (
-            <View
-              key={a.key}
-              className={`cp-activity ${activityKey === a.key ? 'active' : ''}`}
-              onClick={() => setActivityKey(activityKey === a.key ? '' : a.key)}
-            >
-              <Text className='cp-activity-emoji'>{a.emoji}</Text>
-              <Text className='cp-activity-label'>{a.label}</Text>
-            </View>
-          ))}
+      {/* 选择宠物（新建或记录编辑可见） */}
+      {(!editId || mode === 'record') && (
+        <View className='cp-section'>
+          <Text className='cp-label'>选择宠物</Text>
+          <View className='cp-pet-options'>
+            {pets.length > 0 ? (
+              pets.map((pet) => (
+                <View
+                  key={pet.id}
+                  className={`cp-pet-btn ${selectedPet?.id === pet.id ? 'active' : ''}`}
+                  onClick={() => setSelectedPetId(pet.id)}
+                >
+                    {isImageUrl(pet.avatar) ? (
+                      <Image className='cp-pet-avatar' src={pet.avatar} mode='aspectFill' />
+                    ) : (
+                      <Text>{pet.avatar}</Text>
+                    )}
+                    <Text>{pet.name}</Text>
+                </View>
+              ))
+            ) : (
+              <Text className='cp-no-pet'>暂无宠物，请先创建</Text>
+            )}
+          </View>
         </View>
-      </View>
+      )}
+
+      {/* 活动类型（新建或记录编辑可见） */}
+      {(!editId || mode === 'record') && (
+        <View className='cp-section'>
+          <Text className='cp-label'>记录活动（可选）</Text>
+          <View className='cp-activities'>
+            {ACTIVITY_TYPES.map((a) => (
+              <View
+                key={a.key}
+                className={`cp-activity ${activityKey === a.key ? 'active' : ''}`}
+                onClick={() => setActivityKey(activityKey === a.key ? '' : a.key)}
+              >
+                <Text className='cp-activity-emoji'>{a.emoji}</Text>
+                <Text className='cp-activity-label'>{a.label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
 
       {/* 文本输入 */}
       <View className='cp-section'>
@@ -382,10 +454,28 @@ export default function CreatePostPage() {
         </View>
       )}
 
+      {/* 谁可以看（仅动态） */}
+      {target === 'feed' && (
+        <View className='cp-section'>
+          <Text className='cp-label'>谁可以看</Text>
+          <View className='cp-visibilities'>
+            {VISIBILITY_OPTIONS.map((v) => (
+              <View
+                key={v.key}
+                className={`cp-visibility ${visibility === v.key ? 'active' : ''}`}
+                onClick={() => setVisibility(v.key)}
+              >
+                <Text>{v.label}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
+      )}
+
       {/* 发布按钮 */}
       <View className='cp-footer'>
         <View className='cp-publish-btn' onClick={handlePublish}>
-          <Text>{publishing ? '处理中…' : PUBLISH_LABELS[target]}</Text>
+          <Text>{publishing ? '处理中…' : publishLabel}</Text>
         </View>
       </View>
     </View>
