@@ -133,6 +133,11 @@ exports.main = async (event) => {
         createdAt: now,
       };
       const addRes = await feed.add({ data: item });
+
+      // 新建动态返回前把 cloud:// 图片转成临时 https 链接，前端 <image> 才能直接渲染
+      const images = (data && data.images) || [];
+      const imgMap = await toTempUrls(images);
+      const metaMap = await toTempUrls([ownerAvatar, item.pet]);
       return {
         code: 0,
         data: {
@@ -141,7 +146,9 @@ exports.main = async (event) => {
           openid: OPENID,
           visibility,
           owner,
-          ownerAvatar,
+          ownerAvatar: metaMap[ownerAvatar] || ownerAvatar,
+          pet: metaMap[item.pet] || item.pet,
+          images: images.map((id) => imgMap[id] || id),
           likes: 0,
           cmts: 0,
           liked: false,
