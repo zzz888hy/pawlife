@@ -8,6 +8,8 @@ import {
   rejectRequest as rejectRequestApi,
   fetchMessages as fetchMessagesApi,
   sendMessage as sendMessageApi,
+  searchFriends as searchFriendsApi,
+  updateLocation as updateLocationApi,
 } from '@/services/friend';
 
 interface FriendState {
@@ -15,13 +17,19 @@ interface FriendState {
   requests: FriendRequest[];
   chats: Record<string, DirectMessage[]>;
   currentChatId: string | null;
-  fetchFriends: () => Promise<void>;
+  searchResults: PetFriend[];
+  searchKeyword: string;
+  searching: boolean;
+  fetchFriends: (location?: { lat: number; lng: number }) => Promise<void>;
+  updateLocation: (location: { lat: number; lng: number }) => void;
   sendRequest: (friendId: string) => void;
   acceptRequest: (requestId: string) => void;
   rejectRequest: (requestId: string) => void;
   fetchMessages: (friendId: string) => Promise<void>;
   sendMessage: (friendId: string, text: string) => Promise<void>;
   openChat: (friendId: string) => void;
+  searchFriends: (keyword: string) => Promise<void>;
+  clearSearch: () => void;
 }
 
 export const useFriendStore = create<FriendState>((set) => ({
@@ -29,12 +37,19 @@ export const useFriendStore = create<FriendState>((set) => ({
   requests: [],
   chats: {},
   currentChatId: null,
+  searchResults: [],
+  searchKeyword: '',
+  searching: false,
 
-  fetchFriends: async () => {
+  fetchFriends: async (location) => {
     // 先拉发现列表（内部会种默认好友/申请），再拉申请，避免并发抢种
-    const friends = await fetchFriendsApi();
+    const friends = await fetchFriendsApi(location);
     const requests = await fetchRequestsApi();
     set({ friends, requests });
+  },
+
+  updateLocation: (location) => {
+    updateLocationApi(location).catch(() => {});
   },
 
   openChat: (friendId) => set({ currentChatId: friendId }),
@@ -42,9 +57,27 @@ export const useFriendStore = create<FriendState>((set) => ({
   sendRequest: (friendId) => {
     set((s) => ({
       friends: s.friends.map((f) => (f.id === friendId ? { ...f, isRequested: true } : f)),
+      searchResults: s.searchResults.map((f) => (f.id === friendId ? { ...f, isRequested: true } : f)),
     }));
     sendRequestApi(friendId).catch(() => {});
   },
+
+  searchFriends: async (keyword) => {
+    const kw = keyword.trim();
+    if (!kw) {
+      set({ searchResults: [], searchKeyword: '', searching: false });
+      return;
+    }
+    set({ searchKeyword: kw, searching: true });
+    try {
+      const results = await searchFriendsApi(kw);
+      set({ searchResults: results, searching: false });
+    } catch {
+      set({ searchResults: [], searching: false });
+    }
+  },
+
+  clearSearch: () => set({ searchResults: [], searchKeyword: '', searching: false }),
 
   acceptRequest: (requestId) => {
     set((s) => {

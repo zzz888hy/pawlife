@@ -98,6 +98,18 @@
     background: #FFF0EA;
     color: #FF7A59;
   }
+
+  &.disabled {
+    opacity: 0.4;
+    color: #B8B2AC;
+  }
+}
+
+.cpr-cat-hint {
+  display: block;
+  margin-top: 16rpx;
+  font-size: 22rpx;
+  color: #9B958E;
 }
 
 .cpr-price-row {
@@ -178,6 +190,62 @@
   border-radius: 16rpx;
   padding: 20rpx;
   box-sizing: border-box;
+}
+
+// 商品照片
+.cpr-images {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16rpx;
+}
+
+.cpr-image-item {
+  aspect-ratio: 1;
+  position: relative;
+  border-radius: 16rpx;
+  overflow: hidden;
+}
+
+.cpr-image {
+  width: 100%;
+  height: 100%;
+}
+
+.cpr-image-remove {
+  position: absolute;
+  top: 4rpx;
+  right: 4rpx;
+  width: 40rpx;
+  height: 40rpx;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 24rpx;
+}
+
+.cpr-image-add {
+  aspect-ratio: 1;
+  border: 4rpx dashed #D0C8C0;
+  border-radius: 16rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #FAF8F5;
+}
+
+.cpr-add-icon {
+  font-size: 48rpx;
+  color: #9B958E;
+}
+
+.cpr-add-text {
+  font-size: 22rpx;
+  color: #9B958E;
+  margin-top: 8rpx;
 }
 
 .cpr-footer {

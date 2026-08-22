@@ -13,6 +13,7 @@ export interface Product {
   description?: string;
   rating?: number;
   tags?: string[];
+  images?: string[];     // 商品照片（临时 https 链接），最多 9 张
 }
 
 export interface MarketCategory {

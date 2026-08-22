@@ -5,6 +5,72 @@
   flex-direction: column;
 }
 
+// ============ Search ============
+.friends-search {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  padding: 20rpx 24rpx;
+  flex-shrink: 0;
+}
+
+.friends-search-input {
+  flex: 1;
+  height: 72rpx;
+  background: #F5F0EB;
+  border-radius: 36rpx;
+  padding: 0 28rpx;
+  font-size: 26rpx;
+  box-sizing: border-box;
+}
+
+.friends-search-placeholder {
+  color: #B8A99A;
+}
+
+.friends-search-btn {
+  margin-left: 16rpx;
+  padding: 0 32rpx;
+  height: 72rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 36rpx;
+  background: linear-gradient(135deg, #FF7A59, #FF9A76);
+  flex-shrink: 0;
+}
+
+.friends-search-btn-text {
+  font-size: 26rpx;
+  color: #fff;
+  font-weight: 600;
+}
+
+.friends-search-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4rpx 4rpx 20rpx;
+}
+
+.friends-search-header-text {
+  font-size: 26rpx;
+  color: #7C6F5F;
+  font-weight: 600;
+}
+
+.friends-search-clear {
+  font-size: 24rpx;
+  color: #FF7A59;
+}
+
+.search-result-id {
+  display: block;
+  font-size: 22rpx;
+  color: #B8A99A;
+  margin-top: 6rpx;
+}
+
 // ============ Tabs ============
 .friends-tabs {
   display: flex;

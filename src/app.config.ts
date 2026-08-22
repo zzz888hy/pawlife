@@ -48,6 +48,12 @@ export default defineAppConfig({
     navigationBarTitleText: 'PawLife',
     navigationBarTextStyle: 'black',
   },
+  permission: {
+    'scope.userLocation': {
+      desc: '你的位置信息将用于展示附近宠友的距离',
+    },
+  },
+  requiredPrivateInfos: ['getLocation'],
   tabBar: {
     color: '#9B958E',
     selectedColor: '#FF7A59',

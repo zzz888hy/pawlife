@@ -68,16 +68,32 @@ function toDirectMessage(raw: any): DirectMessage {
   };
 }
 
-export async function fetchFriends(): Promise<PetFriend[]> {
+export async function fetchFriends(location?: { lat: number; lng: number }): Promise<PetFriend[]> {
   if (MOCK_ENABLED) return [...mockPetFriends];
-  const list = await callCloudFunction<any[]>('friend', { action: 'discover', data: {} });
+  const list = await callCloudFunction<any[]>('friend', { action: 'discover', data: { location } });
   return (list || []).map(toFriend);
+}
+
+export async function updateLocation(location: { lat: number; lng: number }): Promise<void> {
+  if (MOCK_ENABLED) return;
+  await callCloudFunction('friend', { action: 'updateLocation', data: { location } });
 }
 
 export async function fetchRequests(): Promise<FriendRequest[]> {
   if (MOCK_ENABLED) return [...mockFriendRequests];
   const list = await callCloudFunction<any[]>('friend', { action: 'listRequests', data: {} });
   return (list || []).map(toFriendRequest);
+}
+
+export async function searchFriends(keyword: string): Promise<PetFriend[]> {
+  if (MOCK_ENABLED) {
+    const kw = keyword.trim().toLowerCase();
+    return mockPetFriends.filter(
+      (f) => f.nickname.toLowerCase().includes(kw) || f.id.toLowerCase().includes(kw)
+    );
+  }
+  const list = await callCloudFunction<any[]>('friend', { action: 'searchUser', data: { keyword } });
+  return (list || []).map(toFriend);
 }
 
 export async function sendRequest(friendId: string): Promise<void> {

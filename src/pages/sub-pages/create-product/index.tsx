@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { View, Text, Input, Textarea } from '@tarojs/components';
+import { View, Text, Input, Textarea, Image } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import SubPageHeader from '@/components/SubPageHeader';
 import { useMarketStore } from '@/stores/useMarketStore';
-import { useAppStore } from '@/stores/useAppStore';
+import { chooseImage, uploadFile } from '@/services/cloud';
 import type { SellerType } from '@/types';
 import './index.scss';
 
@@ -35,7 +35,10 @@ const ICON_OPTIONS = [
 
 export default function CreateProductPage() {
   const addProduct = useMarketStore((s) => s.addProduct);
-  const showToast = useAppStore((s) => s.showToast);
+
+  const showToast = (text: string, icon: 'success' | 'none' = 'none') => {
+    Taro.showToast({ title: text, icon });
+  };
 
   const [name, setName] = useState('');
   const [sellerType, setSellerType] = useState<SellerType>('personal');
@@ -44,8 +47,29 @@ export default function CreateProductPage() {
   const [oldPrice, setOldPrice] = useState('');
   const [description, setDescription] = useState('');
   const [iconIndex, setIconIndex] = useState(0);
+  const [images, setImages] = useState<string[]>([]);
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = () => {
+  const handleChooseImage = async () => {
+    if (images.length >= 9) {
+      showToast('最多选择9张照片');
+      return;
+    }
+    const paths = await chooseImage(9 - images.length);
+    if (paths.length > 0) setImages([...images, ...paths]);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages(images.filter((_, i) => i !== index));
+  };
+
+  const handleSellerTypeChange = (key: SellerType) => {
+    setSellerType(key);
+    // 个人卖家不允许发布医疗类商品，切换到个人时自动退回默认分类
+    if (key === 'personal' && category === '医疗') setCategory('用品');
+  };
+
+  const handleSubmit = async () => {
     if (!name.trim()) {
       showToast('请输入商品名称');
       return;
@@ -58,19 +82,38 @@ export default function CreateProductPage() {
     const oldPriceNum = parseFloat(oldPrice);
     const icon = ICON_OPTIONS[iconIndex];
 
-    addProduct({
-      name: name.trim(),
-      category,
-      sellerType,
-      price: Math.round(priceNum * 10) / 10,
-      oldPrice: oldPrice && !isNaN(oldPriceNum) ? oldPriceNum : priceNum,
-      emoji: icon.emoji,
-      bg: icon.bg,
-      description: description.trim() || undefined,
-    });
+    if (sellerType === 'personal' && category === '医疗') {
+      showToast('个人卖家不能发布医疗类商品');
+      return;
+    }
 
-    Taro.showToast({ title: '上架成功！', icon: 'success' });
-    setTimeout(() => Taro.navigateBack(), 800);
+    setSubmitting(true);
+    try {
+      const uploadedUrls: string[] = [];
+      for (let i = 0; i < images.length; i++) {
+        uploadedUrls.push(await uploadFile(images[i], `products/${Date.now()}_${i}.jpg`));
+      }
+
+      await addProduct({
+        name: name.trim(),
+        category,
+        sellerType,
+        price: Math.round(priceNum * 10) / 10,
+        oldPrice: oldPrice && !isNaN(oldPriceNum) ? oldPriceNum : priceNum,
+        emoji: icon.emoji,
+        bg: icon.bg,
+        description: description.trim() || undefined,
+        images: uploadedUrls.length > 0 ? uploadedUrls : undefined,
+      });
+
+      showToast('上架成功！', 'success');
+      setTimeout(() => Taro.navigateBack(), 800);
+    } catch (err) {
+      console.error('[createProduct]', err);
+      showToast('上架失败，请重试');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -85,7 +128,7 @@ export default function CreateProductPage() {
             <View
               key={st.key}
               className={`cpr-seller-type ${sellerType === st.key ? 'active' : ''}`}
-              onClick={() => setSellerType(st.key)}
+              onClick={() => handleSellerTypeChange(st.key)}
             >
               <Text className='cpr-seller-type-label'>{st.label}</Text>
               <Text className='cpr-seller-type-desc'>{st.desc}</Text>
@@ -112,16 +155,22 @@ export default function CreateProductPage() {
       <View className='cpr-section'>
         <Text className='cpr-label'>商品分类</Text>
         <View className='cpr-cats'>
-          {CATEGORIES.map((cat) => (
-            <View
-              key={cat.key}
-              className={`cpr-cat ${category === cat.key ? 'active' : ''}`}
-              onClick={() => setCategory(cat.key)}
-            >
-              <Text>{cat.emoji} {cat.key}</Text>
-            </View>
-          ))}
+          {CATEGORIES.map((cat) => {
+            const disabled = sellerType === 'personal' && cat.key === '医疗';
+            return (
+              <View
+                key={cat.key}
+                className={`cpr-cat ${category === cat.key ? 'active' : ''} ${disabled ? 'disabled' : ''}`}
+                onClick={() => { if (!disabled) setCategory(cat.key); }}
+              >
+                <Text>{cat.emoji} {cat.key}</Text>
+              </View>
+            );
+          })}
         </View>
+        {sellerType === 'personal' && (
+          <Text className='cpr-cat-hint'>个人卖家暂不支持发布医疗类商品</Text>
+        )}
       </View>
 
       {/* 价格 */}
@@ -153,9 +202,30 @@ export default function CreateProductPage() {
         </View>
       </View>
 
+      {/* 商品照片 */}
+      <View className='cpr-section'>
+        <Text className='cpr-label'>商品照片 ({images.length}/9)</Text>
+        <View className='cpr-images'>
+          {images.map((img, i) => (
+            <View key={i} className='cpr-image-item'>
+              <Image className='cpr-image' src={img} mode='aspectFill' />
+              <View className='cpr-image-remove' onClick={() => handleRemoveImage(i)}>
+                <Text>✕</Text>
+              </View>
+            </View>
+          ))}
+          {images.length < 9 && (
+            <View className='cpr-image-add' onClick={handleChooseImage}>
+              <Text className='cpr-add-icon'>+</Text>
+              <Text className='cpr-add-text'>拍照/相册</Text>
+            </View>
+          )}
+        </View>
+      </View>
+
       {/* 商品图标 */}
       <View className='cpr-section'>
-        <Text className='cpr-label'>选择商品图标</Text>
+        <Text className='cpr-label'>选择商品图标（无照片时显示）</Text>
         <View className='cpr-icons'>
           {ICON_OPTIONS.map((icon, i) => (
             <View
@@ -188,7 +258,7 @@ export default function CreateProductPage() {
       {/* 提交 */}
       <View className='cpr-footer'>
         <View className='cpr-submit-btn' onClick={handleSubmit}>
-          <Text>发布商品</Text>
+          <Text>{submitting ? '上架中…' : '发布商品'}</Text>
         </View>
       </View>
     </View>

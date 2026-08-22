@@ -185,9 +185,19 @@ export default function CreatePostPage() {
     showToast('已恢复草稿', 'success');
   };
 
-  // 图片处理：本地临时路径需上传，remote（http/https/cloud:///data:）原样保留
-  const isRemoteUrl = (img: string) =>
-    img.startsWith('http') || img.startsWith('cloud://') || img.startsWith('data:');
+  // 图片处理：只有「已上传/真实远程」地址才跳过上传。
+  // 开发者工具里 chooseImage 返回的本地临时路径形如 http://tmp/…（真机是 wxfile://），
+  // 这些必须上传成 cloud:// fileID，否则临时链接失效后图片就看不到了。
+  const isRemoteUrl = (img: string): boolean => {
+    if (img.startsWith('cloud://') || img.startsWith('data:')) return true;
+    if (img.startsWith('wxfile://')) return false;
+    if (/^https?:\/\//.test(img)) {
+      const host = img.replace(/^https?:\/\//, '').split(/[/?]/)[0];
+      if (host === 'tmp' || host === 'localhost' || host.startsWith('127.0.0.1')) return false;
+      return true;
+    }
+    return false;
+  };
 
   const resolveImageUrl = async (img: string, cloudPath: string): Promise<string> => {
     if (isRemoteUrl(img)) return img;

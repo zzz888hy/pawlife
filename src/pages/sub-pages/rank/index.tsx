@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { View, Text, ScrollView } from '@tarojs/components';
+import { View, Text, ScrollView, Image } from '@tarojs/components';
 import SubPageHeader from '@/components/SubPageHeader';
 import { RankEntry } from '@/services/mock/rank.mock';
 import { fetchRank } from '@/services/rank';
+import { isImageUrl } from '@/utils/format';
 import './index.scss';
 
 const MEDALS = ['🥇', '🥈', '🥉'];
@@ -22,6 +23,14 @@ export default function RankPage() {
 
   const top3 = entries.slice(0, 3);
   const rest = entries.slice(3);
+
+  // 头像可能是 emoji 或（转成临时链接后的）图片 URL，需区分渲染，否则 URL 会以乱码形式显示
+  const renderPetAvatar = (entry: RankEntry) =>
+    isImageUrl(entry.pet) ? (
+      <Image className='rank-avatar-img' src={entry.pet} mode='aspectFill' />
+    ) : (
+      <Text>{entry.pet}</Text>
+    );
 
   return (
     <View className='rank-page'>
@@ -46,7 +55,7 @@ export default function RankPage() {
                 <Text>{MEDALS[idx]}</Text>
               </View>
               <View className='rank-podium-avatar' style={{ background: entry.bg }}>
-                <Text>{entry.pet}</Text>
+                {renderPetAvatar(entry)}
               </View>
               <Text className='rank-podium-name'>{entry.petName}</Text>
               <Text className='rank-podium-likes'>🐾 {entry.likes}</Text>
@@ -60,7 +69,7 @@ export default function RankPage() {
             <View key={entry.id} className='rank-item'>
               <Text className='rank-item-no'>{entry.rank}</Text>
               <View className='rank-item-avatar' style={{ background: entry.bg }}>
-                <Text>{entry.pet}</Text>
+                {renderPetAvatar(entry)}
               </View>
               <View className='rank-item-info'>
                 <Text className='rank-item-name'>{entry.petName}</Text>

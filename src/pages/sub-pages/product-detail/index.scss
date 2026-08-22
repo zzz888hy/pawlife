@@ -43,6 +43,39 @@
   filter: drop-shadow(0 8rpx 24rpx rgba(0, 0, 0, 0.15));
 }
 
+.pd-img-photo {
+  width: 100%;
+  height: 100%;
+}
+
+// ===== Photo Thumbnails =====
+.pd-thumbs {
+  background: #fff;
+  white-space: nowrap;
+  padding: 20rpx 32rpx;
+  box-sizing: border-box;
+}
+
+.pd-thumb {
+  display: inline-block;
+  width: 140rpx;
+  height: 140rpx;
+  border-radius: 12rpx;
+  overflow: hidden;
+  margin-right: 16rpx;
+  border: 4rpx solid transparent;
+  box-sizing: border-box;
+
+  &.active {
+    border-color: #ff6b6b;
+  }
+}
+
+.pd-thumb-img {
+  width: 100%;
+  height: 100%;
+}
+
 // ===== Product Info =====
 .pd-info {
   background: #fff;

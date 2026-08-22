@@ -1,4 +1,4 @@
-import { View, Text, ScrollView } from '@tarojs/components';
+import { View, Text, ScrollView, Image } from '@tarojs/components';
 import Taro, { useRouter } from '@tarojs/taro';
 import { useEffect, useState } from 'react';
 import { useMarketStore } from '@/stores/useMarketStore';
@@ -24,11 +24,13 @@ export default function ProductDetailPage() {
   const showToast = useAppStore((s) => s.showToast);
 
   const [product, setProduct] = useState<Product | undefined>(undefined);
+  const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
     // Fetch product — if store is empty, load products first
     const p = getProductById(productId);
     setProduct(p);
+    setActiveIdx(0);
   }, [productId]);
 
   if (!product) {
@@ -80,8 +82,31 @@ export default function ProductDetailPage() {
       <ScrollView className='pd-scroll' scrollY showScrollbar={false}>
         {/* Product Image Area */}
         <View className='pd-img' style={{ background: product.bg }}>
-          <Text className='pd-img-emoji'>{product.emoji}</Text>
+          {product.images && product.images.length > 0 ? (
+            <Image
+              className='pd-img-photo'
+              src={product.images[Math.min(activeIdx, product.images.length - 1)]}
+              mode='aspectFill'
+            />
+          ) : (
+            <Text className='pd-img-emoji'>{product.emoji}</Text>
+          )}
         </View>
+
+        {/* Photo Thumbnails */}
+        {product.images && product.images.length > 1 && (
+          <ScrollView className='pd-thumbs' scrollX showScrollbar={false}>
+            {product.images.map((img, i) => (
+              <View
+                key={i}
+                className={`pd-thumb ${activeIdx === i ? 'active' : ''}`}
+                onClick={() => setActiveIdx(i)}
+              >
+                <Image className='pd-thumb-img' src={img} mode='aspectFill' />
+              </View>
+            ))}
+          </ScrollView>
+        )}
 
         {/* Product Info Card */}
         <View className='pd-info'>

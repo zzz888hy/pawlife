@@ -1,4 +1,4 @@
-import { View, Text } from '@tarojs/components';
+import { View, Text, Image } from '@tarojs/components';
 import type { Product } from '@/types';
 import './index.scss';
 
@@ -14,7 +14,11 @@ export default function ProductCard({ product, onClick }: ProductCardProps) {
         <View className={`product-seller-badge ${product.sellerType === 'personal' ? 'personal' : ''}`}>
           <Text>{product.sellerType === 'personal' ? '个人二手' : '商家'}</Text>
         </View>
-        <Text>{product.emoji}</Text>
+        {product.images && product.images.length > 0 ? (
+          <Image className='product-img-photo' src={product.images[0]} mode='aspectFill' />
+        ) : (
+          <Text>{product.emoji}</Text>
+        )}
       </View>
       <View className='product-info'>
         <Text className='product-name'>{product.name}</Text>

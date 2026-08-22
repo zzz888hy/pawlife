@@ -1,7 +1,6 @@
 import { create } from 'zustand';
 import type { Product, MarketCategory, CartItem, Order, OrderItem, OrderStatus } from '@/types';
 import { mockMarketCategories } from '@/services/mock/market.mock';
-import { generateId } from '@/utils/format';
 import {
   fetchProducts as fetchProductsApi,
   createProduct as createProductApi,
@@ -29,7 +28,7 @@ interface MarketState {
   removeFromCart: (productId: string) => void;
   clearCart: () => void;
   getProductById: (id: string) => Product | undefined;
-  addProduct: (data: Omit<Product, 'id' | 'sold'>) => Product;
+  addProduct: (data: Omit<Product, 'id' | 'sold'>) => Promise<Product>;
   placeOrder: (items: OrderItem[], totalPrice: number) => Promise<Order>;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
 }
@@ -99,14 +98,9 @@ export const useMarketStore = create<MarketState>((set, get) => ({
 
   getProductById: (id) => get().products.find((p) => p.id === id),
 
-  addProduct: (data) => {
-    const product: Product = {
-      ...data,
-      id: generateId(),
-      sold: '0',
-    };
+  addProduct: async (data) => {
+    const product = await createProductApi(data);
     set((s) => ({ products: [product, ...s.products] }));
-    createProductApi(data).catch(() => {});
     return product;
   },
 

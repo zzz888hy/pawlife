@@ -41,17 +41,18 @@ exports.main = async () => {
     for (const p of products) await db.collection('products').add({ data: { ...p, createdAt: new Date() } });
 
     // 附近宠友（发现列表）——固定 _id，好友关系/申请按此 id 关联，避免重跑 db-init 后失联
+    // 坐标以西安钟楼附近为中心（34.2610, 108.9425），按各自 distance 在四周散开；换城市改这里 location 即可
     const friends = [
-      { _id: 'f-xiaolu', nickname: '小鹿', avatar: '🦌', petName: '豆豆', petEmoji: '🐕', breed: '柯基', distance: '500m', signature: '和豆豆一起散步的第800天', online: true, tags: ['柯基', '户外'] },
-      { _id: 'f-aco', nickname: '阿橙', avatar: '🍊', petName: '团子', petEmoji: '🐱', breed: '英短', distance: '800m', signature: '喵星人铲屎官，欢迎来撸', online: true, tags: ['英短', '宅家'] },
-      { _id: 'f-wanfeng', nickname: '晚风', avatar: '🌙', petName: '雪球', petEmoji: '🐰', breed: '垂耳兔', distance: '1.2km', signature: '兔兔也可以交朋友哦', online: false, tags: ['兔兔', '安静'] },
-      { _id: 'f-nuomi', nickname: '糯米', avatar: '🍡', petName: '布丁', petEmoji: '🐕', breed: '泰迪', distance: '1.5km', signature: '泰迪精力旺盛，求遛', online: true, tags: ['泰迪', '遛狗'] },
-      { _id: 'f-dabai', nickname: '大白', avatar: '🐻', petName: '可乐', petEmoji: '🐕', breed: '金毛', distance: '2km', signature: '金毛暖男本男', online: true, tags: ['金毛', '暖男'] },
-      { _id: 'f-tangtang', nickname: '糖糖', avatar: '🍬', petName: '奶昔', petEmoji: '🐱', breed: '布偶', distance: '2.3km', signature: '布偶奶昔的日常', online: false, tags: ['布偶', '拍照'] },
-      { _id: 'f-youzi', nickname: '柚子', avatar: '🍋', petName: '球球', petEmoji: '🐕', breed: '柴犬', distance: '3km', signature: '柴犬的倔强你不懂', online: true, tags: ['柴犬', '搞笑'] },
-      { _id: 'f-xiaoman', nickname: '小满', avatar: '🌿', petName: '汤圆', petEmoji: '🐱', breed: '橘猫', distance: '3.5km', signature: '橘猫减肥中，监督我', online: false, tags: ['橘猫', '减肥'] },
-      { _id: 'f-strawberry', nickname: '草莓', avatar: '🍓', petName: '毛球', petEmoji: '🐱', breed: '美短', distance: '900m', signature: '美短小粘人精', online: true, tags: ['美短', '粘人'] },
-      { _id: 'f-ashu', nickname: '阿树', avatar: '🌲', petName: '蛋挞', petEmoji: '🐕', breed: '边牧', distance: '1.8km', signature: '边牧的智商碾压我', online: false, tags: ['边牧', '聪明'] },
+      { _id: 'f-xiaolu', nickname: '小鹿', avatar: '🦌', petName: '豆豆', petEmoji: '🐕', breed: '柯基', distance: '500m', signature: '和豆豆一起散步的第800天', online: true, tags: ['柯基', '户外'], location: { lat: 34.2655, lng: 108.9425 } },
+      { _id: 'f-aco', nickname: '阿橙', avatar: '🍊', petName: '团子', petEmoji: '🐱', breed: '英短', distance: '800m', signature: '喵星人铲屎官，欢迎来撸', online: true, tags: ['英短', '宅家'], location: { lat: 34.2610, lng: 108.9512 } },
+      { _id: 'f-wanfeng', nickname: '晚风', avatar: '🌙', petName: '雪球', petEmoji: '🐰', breed: '垂耳兔', distance: '1.2km', signature: '兔兔也可以交朋友哦', online: false, tags: ['兔兔', '安静'], location: { lat: 34.2718, lng: 108.9425 } },
+      { _id: 'f-nuomi', nickname: '糯米', avatar: '🍡', petName: '布丁', petEmoji: '🐕', breed: '泰迪', distance: '1.5km', signature: '泰迪精力旺盛，求遛', online: true, tags: ['泰迪', '遛狗'], location: { lat: 34.2475, lng: 108.9425 } },
+      { _id: 'f-dabai', nickname: '大白', avatar: '🐻', petName: '可乐', petEmoji: '🐕', breed: '金毛', distance: '2km', signature: '金毛暖男本男', online: true, tags: ['金毛', '暖男'], location: { lat: 34.2610, lng: 108.9643 } },
+      { _id: 'f-tangtang', nickname: '糖糖', avatar: '🍬', petName: '奶昔', petEmoji: '🐱', breed: '布偶', distance: '2.3km', signature: '布偶奶昔的日常', online: false, tags: ['布偶', '拍照'], location: { lat: 34.2817, lng: 108.9425 } },
+      { _id: 'f-youzi', nickname: '柚子', avatar: '🍋', petName: '球球', petEmoji: '🐕', breed: '柴犬', distance: '3km', signature: '柴犬的倔强你不懂', online: true, tags: ['柴犬', '搞笑'], location: { lat: 34.2341, lng: 108.9425 } },
+      { _id: 'f-xiaoman', nickname: '小满', avatar: '🌿', petName: '汤圆', petEmoji: '🐱', breed: '橘猫', distance: '3.5km', signature: '橘猫减肥中，监督我', online: false, tags: ['橘猫', '减肥'], location: { lat: 34.2610, lng: 108.9806 } },
+      { _id: 'f-strawberry', nickname: '草莓', avatar: '🍓', petName: '毛球', petEmoji: '🐱', breed: '美短', distance: '900m', signature: '美短小粘人精', online: true, tags: ['美短', '粘人'], location: { lat: 34.2610, lng: 108.9327 } },
+      { _id: 'f-ashu', nickname: '阿树', avatar: '🌲', petName: '蛋挞', petEmoji: '🐕', breed: '边牧', distance: '1.8km', signature: '边牧的智商碾压我', online: false, tags: ['边牧', '聪明'], location: { lat: 34.2772, lng: 108.9425 } },
     ];
     for (const f of friends) await db.collection('friends').add({ data: f });
 

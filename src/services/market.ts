@@ -42,6 +42,7 @@ function toProduct(raw: any): Product {
     description: raw.description,
     rating: raw.rating,
     tags: raw.tags || [],
+    images: raw.images || undefined,
   };
 }
 
@@ -66,9 +67,24 @@ export async function fetchProducts(category?: string): Promise<Product[]> {
   return (list || []).map(toProduct);
 }
 
-export async function createProduct(data: Record<string, unknown>): Promise<void> {
-  if (MOCK_ENABLED) return;
-  await callCloudFunction('product', { action: 'create', data });
+export async function createProduct(data: Record<string, unknown>): Promise<Product> {
+  if (MOCK_ENABLED) {
+    return {
+      id: generateId(),
+      emoji: (data.emoji as string) || '🐾',
+      name: (data.name as string) || '商品',
+      price: (data.price as number) || 0,
+      oldPrice: (data.oldPrice as number) || (data.price as number) || 0,
+      sold: '0',
+      bg: (data.bg as string) || pickBg('mock'),
+      category: (data.category as string) || '用品',
+      sellerType: (data.sellerType as 'merchant' | 'personal') || 'merchant',
+      description: data.description as string | undefined,
+      images: (data.images as string[]) || undefined,
+    };
+  }
+  const raw = await callCloudFunction<any>('product', { action: 'create', data });
+  return toProduct(raw);
 }
 
 export async function addToCart(productId: string): Promise<void> {
