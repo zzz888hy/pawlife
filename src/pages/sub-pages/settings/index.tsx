@@ -4,6 +4,7 @@ import Taro from '@tarojs/taro';
 import SubPageHeader from '@/components/SubPageHeader';
 import { useUserStore } from '@/stores/useUserStore';
 import { useAppStore } from '@/stores/useAppStore';
+import { updateUserProfile } from '@/services/auth';
 import './index.scss';
 
 const AVATAR_EMOJIS = ['😎', '🐱', '🐶', '🐰', '🐹', '🦊', '🐻', '🐼', '🦁', '🐯', '🐨', '🐷'];
@@ -36,15 +37,20 @@ export default function SettingsPage() {
     }
   };
 
-  const handleSaveProfile = () => {
+  const handleSaveProfile = async () => {
     const name = editNickname.trim();
     if (!name) {
-      showToast('昵称不能为空');
+      Taro.showToast({ title: '昵称不能为空', icon: 'none' });
       return;
     }
     setUser({ nickname: name, avatar: editAvatar });
     setEditing(false);
-    showToast('已保存');
+    try {
+      await updateUserProfile({ nickname: name, avatarUrl: editAvatar });
+      Taro.showToast({ title: '已保存', icon: 'success' });
+    } catch {
+      Taro.showToast({ title: '保存失败，请重试', icon: 'none' });
+    }
   };
 
   const handleClearCache = () => {

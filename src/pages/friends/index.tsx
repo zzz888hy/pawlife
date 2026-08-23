@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { View, Text, ScrollView, Input } from '@tarojs/components';
-import Taro from '@tarojs/taro';
+import Taro, { useDidShow } from '@tarojs/taro';
 import { useFriendStore } from '@/stores/useFriendStore';
 import { useAppStore } from '@/stores/useAppStore';
 import type { PetFriend } from '@/types';
@@ -34,7 +34,7 @@ export default function FriendsPage() {
   const [tab, setTab] = useState<TabKey>('nearby');
   const [keyword, setKeyword] = useState('');
 
-  useEffect(() => {
+  useDidShow(() => {
     Taro.getLocation({ type: 'gcj02' })
       .then((res) => {
         const loc = { lat: res.latitude, lng: res.longitude };
@@ -45,7 +45,7 @@ export default function FriendsPage() {
         // 定位失败或未授权：不传坐标，走兜底（种子宠友的硬编码距离）
         fetchFriends();
       });
-  }, []);
+  });
 
   const pendingCount = useMemo(
     () => requests.filter((r) => r.status === 'pending').length,
