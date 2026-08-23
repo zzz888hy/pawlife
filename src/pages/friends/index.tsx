@@ -1,8 +1,8 @@
 import { useMemo, useState } from 'react';
-import { View, Text, ScrollView, Input } from '@tarojs/components';
+import { View, Text, ScrollView, Input, Image } from '@tarojs/components';
 import Taro, { useDidShow } from '@tarojs/taro';
 import { useFriendStore } from '@/stores/useFriendStore';
-import { useAppStore } from '@/stores/useAppStore';
+import { isImageUrl } from '@/utils/format';
 import type { PetFriend } from '@/types';
 import './index.scss';
 
@@ -30,7 +30,6 @@ export default function FriendsPage() {
     clearSearch,
     updateLocation,
   } = useFriendStore();
-  const showToast = useAppStore((s) => s.showToast);
   const [tab, setTab] = useState<TabKey>('nearby');
   const [keyword, setKeyword] = useState('');
 
@@ -63,19 +62,31 @@ export default function FriendsPage() {
     Taro.navigateTo({ url: `/pages/sub-pages/chat/index?id=${friend.id}` });
   };
 
-  const handleAdd = (friend: PetFriend) => {
-    sendRequest(friend.id);
-    showToast(`已向 ${friend.nickname} 发送申请`);
+  const handleAdd = async (friend: PetFriend) => {
+    try {
+      await sendRequest(friend.id);
+      Taro.showToast({ title: `已向 ${friend.nickname} 发送申请`, icon: 'success' });
+    } catch {
+      Taro.showToast({ title: '发送失败，请重试', icon: 'none' });
+    }
   };
 
-  const handleAccept = (requestId: string, nickname: string) => {
-    acceptRequest(requestId);
-    showToast(`已通过 ${nickname} 的申请`);
+  const handleAccept = async (requestId: string, nickname: string) => {
+    try {
+      await acceptRequest(requestId);
+      Taro.showToast({ title: `已通过 ${nickname} 的申请`, icon: 'success' });
+    } catch {
+      Taro.showToast({ title: '操作失败，请重试', icon: 'none' });
+    }
   };
 
-  const handleReject = (requestId: string) => {
-    rejectRequest(requestId);
-    showToast('已忽略');
+  const handleReject = async (requestId: string) => {
+    try {
+      await rejectRequest(requestId);
+      Taro.showToast({ title: '已忽略', icon: 'none' });
+    } catch {
+      Taro.showToast({ title: '操作失败，请重试', icon: 'none' });
+    }
   };
 
   const handleSearch = () => {
@@ -90,7 +101,11 @@ export default function FriendsPage() {
   const renderSearchResult = (u: PetFriend) => (
     <View key={u.id} className='friend-card'>
       <View className='friend-avatar'>
-        <Text className='friend-avatar-emoji'>{u.avatar}</Text>
+        {isImageUrl(u.avatar) ? (
+          <Image className='friend-avatar-img' src={u.avatar} mode='aspectFill' />
+        ) : (
+          <Text className='friend-avatar-emoji'>{u.avatar}</Text>
+        )}
       </View>
       <View className='friend-body'>
         <View className='friend-name-row'>
@@ -104,8 +119,8 @@ export default function FriendsPage() {
         </View>
       )}
       {!u.isFriend && u.isRequested && (
-        <View className='friend-add-btn friend-add-btn--pending'>
-          <Text className='friend-add-text'>已申请</Text>
+        <View className='friend-add-btn friend-add-btn--pending' onClick={() => handleAdd(u)}>
+          <Text className='friend-add-text'>已申请 · 点此重发</Text>
         </View>
       )}
       {u.isFriend && (
@@ -119,7 +134,11 @@ export default function FriendsPage() {
   const renderFriendCard = (friend: PetFriend) => (
     <View key={friend.id} className='friend-card' onClick={() => friend.isFriend && handleChat(friend)}>
       <View className='friend-avatar'>
-        <Text className='friend-avatar-emoji'>{friend.avatar}</Text>
+        {isImageUrl(friend.avatar) ? (
+          <Image className='friend-avatar-img' src={friend.avatar} mode='aspectFill' />
+        ) : (
+          <Text className='friend-avatar-emoji'>{friend.avatar}</Text>
+        )}
         {friend.online && <View className='friend-online-dot' />}
       </View>
       <View className='friend-body'>
@@ -143,8 +162,8 @@ export default function FriendsPage() {
         </View>
       )}
       {!friend.isFriend && friend.isRequested && (
-        <View className='friend-add-btn friend-add-btn--pending' onClick={(e) => e.stopPropagation()}>
-          <Text className='friend-add-text'>已申请</Text>
+        <View className='friend-add-btn friend-add-btn--pending' onClick={(e) => { e.stopPropagation(); handleAdd(friend); }}>
+          <Text className='friend-add-text'>已申请 · 点此重发</Text>
         </View>
       )}
       {friend.isFriend && (
@@ -243,7 +262,11 @@ export default function FriendsPage() {
                   pendingRequests.map((req) => (
                     <View key={req.id} className='request-card'>
                       <View className='friend-avatar'>
-                        <Text className='friend-avatar-emoji'>{req.friend.avatar}</Text>
+                        {isImageUrl(req.friend.avatar) ? (
+                          <Image className='friend-avatar-img' src={req.friend.avatar} mode='aspectFill' />
+                        ) : (
+                          <Text className='friend-avatar-emoji'>{req.friend.avatar}</Text>
+                        )}
                       </View>
                       <View className='friend-body'>
                         <View className='friend-name-row'>

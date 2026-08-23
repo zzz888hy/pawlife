@@ -25,10 +25,16 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
 }
 
 .chat-head-avatar-emoji {
   font-size: 36rpx;
+}
+
+.chat-head-avatar-img {
+  width: 100%;
+  height: 100%;
 }
 
 .chat-head-info {
@@ -87,6 +93,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  overflow: hidden;
 
   .chat-msg--me & {
     background: #EAF3FE;
@@ -95,6 +102,11 @@
 
 .chat-msg-avatar-emoji {
   font-size: 30rpx;
+}
+
+.chat-msg-avatar-img {
+  width: 100%;
+  height: 100%;
 }
 
 .chat-msg-bubble {

@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
-import { View, Text, Input, ScrollView } from '@tarojs/components';
+import { View, Text, Input, ScrollView, Image } from '@tarojs/components';
 import { useRouter } from '@tarojs/taro';
 import SubPageHeader from '@/components/SubPageHeader';
 import { useFriendStore } from '@/stores/useFriendStore';
 import { useAppStore } from '@/stores/useAppStore';
+import { isImageUrl } from '@/utils/format';
 import './index.scss';
 
 export default function ChatPage() {
@@ -21,7 +22,12 @@ export default function ChatPage() {
   const [sending, setSending] = useState(false);
 
   useEffect(() => {
-    if (friendId) fetchMessages(friendId);
+    if (!friendId) return;
+    const safeFetch = () => { fetchMessages(friendId).catch(() => {}); };
+    safeFetch();
+    // 轮询拉取最新消息，让真实用户双方都能看到对方发来的内容
+    const timer = setInterval(safeFetch, 3000);
+    return () => clearInterval(timer);
   }, [friendId]);
 
   const messages = chats[friendId] || [];
@@ -57,7 +63,11 @@ export default function ChatPage() {
       {/* Friend Info Bar */}
       <View className='chat-head'>
         <View className='chat-head-avatar'>
-          <Text className='chat-head-avatar-emoji'>{friend.avatar}</Text>
+          {isImageUrl(friend.avatar) ? (
+            <Image className='chat-head-avatar-img' src={friend.avatar} mode='aspectFill' />
+          ) : (
+            <Text className='chat-head-avatar-emoji'>{friend.avatar}</Text>
+          )}
         </View>
         <View className='chat-head-info'>
           <Text className='chat-head-name'>{friend.nickname}</Text>
@@ -82,7 +92,11 @@ export default function ChatPage() {
             >
               {msg.role !== 'me' && (
                 <View className='chat-msg-avatar'>
-                  <Text className='chat-msg-avatar-emoji'>{friend.avatar}</Text>
+                  {isImageUrl(friend.avatar) ? (
+                    <Image className='chat-msg-avatar-img' src={friend.avatar} mode='aspectFill' />
+                  ) : (
+                    <Text className='chat-msg-avatar-emoji'>{friend.avatar}</Text>
+                  )}
                 </View>
               )}
               <View className={`chat-msg-bubble ${msg.role === 'me' ? 'chat-msg-bubble--me' : 'chat-msg-bubble--friend'}`}>
@@ -100,7 +114,11 @@ export default function ChatPage() {
           {sending && (
             <View className='chat-msg chat-msg--friend'>
               <View className='chat-msg-avatar'>
-                <Text className='chat-msg-avatar-emoji'>{friend.avatar}</Text>
+                {isImageUrl(friend.avatar) ? (
+                  <Image className='chat-msg-avatar-img' src={friend.avatar} mode='aspectFill' />
+                ) : (
+                  <Text className='chat-msg-avatar-emoji'>{friend.avatar}</Text>
+                )}
               </View>
               <View className='chat-msg-bubble chat-msg-bubble--friend chat-msg-bubble--typing'>
                 <View className='chat-typing-dots'>

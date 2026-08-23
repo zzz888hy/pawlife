@@ -29,6 +29,34 @@ function escapeRegExp(s) {
   return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
+// 把 cloud:// 文件ID 批量替换成临时 https 链接（云函数签发，其他用户才能看到）
+async function toTempUrls(ids) {
+  const fileIds = [...new Set((ids || []).filter((id) => typeof id === 'string' && id.startsWith('cloud://')))];
+  if (fileIds.length === 0) return {};
+  try {
+    const res = await cloud.getTempFileURL({ fileList: fileIds });
+    const map = {};
+    (res.fileList || []).forEach((f) => {
+      if (f.status === 0 && f.tempFileURL) map[f.fileID] = f.tempFileURL;
+    });
+    return map;
+  } catch (err) {
+    console.error('getTempFileURL error:', err);
+    return {};
+  }
+}
+
+// 把列表里的头像（cloud://）转成临时链接；emoji 头像原样返回
+async function decorateAvatars(items) {
+  const map = await toTempUrls((items || []).map((it) => it.avatar));
+  return (items || []).map((it) => (map[it.avatar] ? { ...it, avatar: map[it.avatar] } : it));
+}
+
+// 生成两个人之间的共享会话 ID：双方 openid 排序后拼在一起，保证 A↔B 双方用同一串
+function convIdOf(a, b) {
+  return [a, b].sort().join('__');
+}
+
 // 把 users 集合里的真实用户映射成宠友卡片所需的字段
 function userToFriend(u, id) {
   return {
@@ -195,15 +223,19 @@ exports.main = async (event) => {
       }
       items.forEach((f) => { delete f._meters; delete f._loc; delete f._isReal; });
 
-      return { code: 0, data: items };
+      return { code: 0, data: await decorateAvatars(items) };
     }
 
     case 'sendRequest': {
       // 发出好友申请（兼容种子宠友 + 真实用户）
       const f = await resolveTarget(data.friendId);
       if (!f) return { code: 404, message: '未找到该用户' };
-      const exist = await requestsCol().where({ openid: OPENID, friendId: data.friendId }).get();
-      if (exist.data.length === 0) {
+
+      // 1. 幂等创建「我发出的」申请（独立判断，避免之前半途失败导致补不上）
+      const outExist = await requestsCol()
+        .where({ openid: OPENID, friendId: data.friendId, direction: 'outgoing' })
+        .get();
+      if (outExist.data.length === 0) {
         await requestsCol().add({
           data: {
             openid: OPENID,
@@ -225,39 +257,41 @@ exports.main = async (event) => {
             createdAt: new Date(),
           },
         });
+      }
 
-        // 目标是真实用户时，给对方种一条 incoming 申请，让对方在「好友申请」里看到并处理
-        if (f.openid && f.openid !== OPENID) {
-          const meRes = await usersCol().where({ openid: OPENID }).get();
-          const meDoc = meRes.data[0];
-          if (meDoc) {
-            const incomingExist = await requestsCol()
-              .where({ openid: f.openid, friendId: meDoc._id, direction: 'incoming' })
-              .get();
-            if (incomingExist.data.length === 0) {
-              await requestsCol().add({
-                data: {
-                  openid: f.openid,
-                  direction: 'incoming',
-                  friendId: meDoc._id,
-                  fromOpenid: OPENID,
-                  toOpenid: f.openid,
-                  nickname: meDoc.nickname || '宠友',
-                  avatar: meDoc.avatarUrl || '🐾',
-                  petName: meDoc.petName || '',
-                  petEmoji: meDoc.petEmoji || '🐾',
-                  breed: meDoc.breed || '',
-                  distance: '',
-                  signature: meDoc.signature || '',
-                  online: false,
-                  tags: meDoc.tags || [],
-                  message: '申请加你为好友',
-                  status: 'pending',
-                  createdAt: new Date(),
-                },
-              });
-            }
-          }
+      // 2. 幂等创建「对方收到的」申请（目标是真实用户时才种，独立于上一步）
+      if (f.openid && f.openid !== OPENID) {
+        const meRes = await usersCol().where({ openid: OPENID }).get();
+        const meDoc = meRes.data[0];
+        if (!meDoc) {
+          // 目标真实用户但「我」的档案缺失，无法建立反向好友关系——明确报错而不是静默成功
+          return { code: 500, message: '当前用户档案缺失，请重新登录后再试' };
+        }
+        const incomingExist = await requestsCol()
+          .where({ openid: f.openid, friendId: meDoc._id, direction: 'incoming' })
+          .get();
+        if (incomingExist.data.length === 0) {
+          await requestsCol().add({
+            data: {
+              openid: f.openid,
+              direction: 'incoming',
+              friendId: meDoc._id,
+              fromOpenid: OPENID,
+              toOpenid: f.openid,
+              nickname: meDoc.nickname || '宠友',
+              avatar: meDoc.avatarUrl || '🐾',
+              petName: meDoc.petName || '',
+              petEmoji: meDoc.petEmoji || '🐾',
+              breed: meDoc.breed || '',
+              distance: '',
+              signature: meDoc.signature || '',
+              online: false,
+              tags: meDoc.tags || [],
+              message: '申请加你为好友',
+              status: 'pending',
+              createdAt: new Date(),
+            },
+          });
         }
       }
       return { code: 0, data: { ok: true } };
@@ -296,16 +330,53 @@ exports.main = async (event) => {
           isFriend: mySet.has(u._id),
           isRequested: reqSet.has(u._id),
         }));
-      return { code: 0, data: list };
+      return { code: 0, data: await decorateAvatars(list) };
     }
 
     case 'listRequests': {
+      // 自愈：有人给我发过申请（outgoing 且 toOpenid 是我）但我这边缺 incoming 时，补种一条，避免「对方看不到申请」
+      const orphanOut = await requestsCol()
+        .where({ toOpenid: OPENID, direction: 'outgoing', status: 'pending' })
+        .get();
+      for (const o of orphanOut.data) {
+        if (!o.fromOpenid) continue;
+        const senderRes = await usersCol().where({ openid: o.fromOpenid }).get();
+        const senderDoc = senderRes.data[0];
+        if (!senderDoc) continue;
+        const exist = await requestsCol()
+          .where({ openid: OPENID, direction: 'incoming', friendId: senderDoc._id })
+          .get();
+        if (exist.data.length === 0) {
+          await requestsCol().add({
+            data: {
+              openid: OPENID,
+              direction: 'incoming',
+              friendId: senderDoc._id,
+              fromOpenid: o.fromOpenid,
+              toOpenid: OPENID,
+              nickname: senderDoc.nickname || '宠友',
+              avatar: senderDoc.avatarUrl || '🐾',
+              petName: senderDoc.petName || '',
+              petEmoji: senderDoc.petEmoji || '🐾',
+              breed: senderDoc.breed || '',
+              distance: '',
+              signature: senderDoc.signature || '',
+              online: false,
+              tags: senderDoc.tags || [],
+              message: '申请加你为好友',
+              status: 'pending',
+              createdAt: o.createdAt || new Date(),
+            },
+          });
+        }
+      }
+
       // 只返回「收到的」申请（outgoing 由 discover/searchUser 计算 isRequested 用）
       const res = await requestsCol()
         .where({ openid: OPENID, direction: 'incoming' })
         .orderBy('createdAt', 'desc')
         .get();
-      return { code: 0, data: res.data };
+      return { code: 0, data: await decorateAvatars(res.data) };
     }
 
     case 'acceptRequest': {
@@ -339,6 +410,23 @@ exports.main = async (event) => {
     }
 
     case 'listMessages': {
+      const target = await resolveTarget(data.friendId);
+      // 真实用户：共享会话（双方 openid 排序得到同一 convId），消息互通、不自动回复
+      if (target && target.openid && target.openid !== OPENID) {
+        const convId = convIdOf(OPENID, target.openid);
+        const res = await messagesCol()
+          .where({ convId })
+          .orderBy('createdAt', 'asc')
+          .get();
+        const list = res.data.map((m) => ({
+          _id: m._id,
+          role: m.fromOpenid === OPENID ? 'me' : 'friend',
+          text: m.text,
+          createdAt: m.createdAt,
+        }));
+        return { code: 0, data: list };
+      }
+      // 种子宠友：沿用个人聊天记录 + 自动回复
       const res = await messagesCol()
         .where({ openid: OPENID, friendId: data.friendId })
         .orderBy('createdAt', 'asc')
@@ -347,6 +435,22 @@ exports.main = async (event) => {
     }
 
     case 'sendMessage': {
+      const target = await resolveTarget(data.friendId);
+      // 真实用户：写入共享会话，对方打开私聊即可看到，不自动回复
+      if (target && target.openid && target.openid !== OPENID) {
+        const convId = convIdOf(OPENID, target.openid);
+        const msg = { convId, fromOpenid: OPENID, text: data.text, createdAt: new Date() };
+        const addRes = await messagesCol().add({ data: msg });
+        return {
+          code: 0,
+          data: {
+            me: { _id: addRes._id, role: 'me', text: data.text, createdAt: msg.createdAt },
+            reply: null,
+          },
+        };
+      }
+
+      // 种子宠友：自动回复
       const me = {
         openid: OPENID,
         friendId: data.friendId,

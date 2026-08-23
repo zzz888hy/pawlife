@@ -22,9 +22,9 @@ interface FriendState {
   searching: boolean;
   fetchFriends: (location?: { lat: number; lng: number }) => Promise<void>;
   updateLocation: (location: { lat: number; lng: number }) => void;
-  sendRequest: (friendId: string) => void;
-  acceptRequest: (requestId: string) => void;
-  rejectRequest: (requestId: string) => void;
+  sendRequest: (friendId: string) => Promise<void>;
+  acceptRequest: (requestId: string) => Promise<void>;
+  rejectRequest: (requestId: string) => Promise<void>;
   fetchMessages: (friendId: string) => Promise<void>;
   sendMessage: (friendId: string, text: string) => Promise<void>;
   openChat: (friendId: string) => void;
@@ -54,12 +54,21 @@ export const useFriendStore = create<FriendState>((set) => ({
 
   openChat: (friendId) => set({ currentChatId: friendId }),
 
-  sendRequest: (friendId) => {
+  sendRequest: async (friendId) => {
     set((s) => ({
       friends: s.friends.map((f) => (f.id === friendId ? { ...f, isRequested: true } : f)),
       searchResults: s.searchResults.map((f) => (f.id === friendId ? { ...f, isRequested: true } : f)),
     }));
-    sendRequestApi(friendId).catch(() => {});
+    try {
+      await sendRequestApi(friendId);
+    } catch (e) {
+      // 失败回滚，避免误显示「已申请」
+      set((s) => ({
+        friends: s.friends.map((f) => (f.id === friendId ? { ...f, isRequested: false } : f)),
+        searchResults: s.searchResults.map((f) => (f.id === friendId ? { ...f, isRequested: false } : f)),
+      }));
+      throw e;
+    }
   },
 
   searchFriends: async (keyword) => {
@@ -79,27 +88,49 @@ export const useFriendStore = create<FriendState>((set) => ({
 
   clearSearch: () => set({ searchResults: [], searchKeyword: '', searching: false }),
 
-  acceptRequest: (requestId) => {
+  acceptRequest: async (requestId) => {
+    let wasNew = false;
+    let friendId = '';
     set((s) => {
       const req = s.requests.find((r) => r.id === requestId);
       if (!req) return {};
+      friendId = req.friend.id;
       // 对方可能已在「附近宠友」列表里（isFriend=false），这里要把它翻成 true，而不是判断是否新增
-      const inList = s.friends.some((f) => f.id === req.friend.id);
+      const inList = s.friends.some((f) => f.id === friendId);
+      wasNew = !inList;
       return {
         requests: s.requests.map((r) => (r.id === requestId ? { ...r, status: 'accepted' as const } : r)),
         friends: inList
-          ? s.friends.map((f) => (f.id === req.friend.id ? { ...f, isFriend: true } : f))
+          ? s.friends.map((f) => (f.id === friendId ? { ...f, isFriend: true } : f))
           : [...s.friends, { ...req.friend, isFriend: true }],
       };
     });
-    acceptRequestApi(requestId).catch(() => {});
+    try {
+      await acceptRequestApi(requestId);
+    } catch (e) {
+      // 失败回滚：申请恢复待处理，好友恢复原状
+      set((s) => ({
+        requests: s.requests.map((r) => (r.id === requestId ? { ...r, status: 'pending' as const } : r)),
+        friends: wasNew
+          ? s.friends.filter((f) => f.id !== friendId)
+          : s.friends.map((f) => (f.id === friendId ? { ...f, isFriend: false } : f)),
+      }));
+      throw e;
+    }
   },
 
-  rejectRequest: (requestId) => {
+  rejectRequest: async (requestId) => {
     set((s) => ({
       requests: s.requests.map((r) => (r.id === requestId ? { ...r, status: 'rejected' as const } : r)),
     }));
-    rejectRequestApi(requestId).catch(() => {});
+    try {
+      await rejectRequestApi(requestId);
+    } catch (e) {
+      set((s) => ({
+        requests: s.requests.map((r) => (r.id === requestId ? { ...r, status: 'pending' as const } : r)),
+      }));
+      throw e;
+    }
   },
 
   fetchMessages: async (friendId) => {
