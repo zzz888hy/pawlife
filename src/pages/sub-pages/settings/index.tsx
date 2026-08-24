@@ -43,10 +43,11 @@ export default function SettingsPage() {
       Taro.showToast({ title: '昵称不能为空', icon: 'none' });
       return;
     }
-    setUser({ nickname: name, avatar: editAvatar });
-    setEditing(false);
     try {
-      await updateUserProfile({ nickname: name, avatarUrl: editAvatar });
+      // 以服务端返回为准：昵称冲突时服务端会追加数字后缀，本地要同步显示，避免自己看到 ZR、别人看到别的名字
+      const user = await updateUserProfile({ nickname: name, avatarUrl: editAvatar });
+      setUser({ nickname: user?.nickname ?? name, avatar: user?.avatarUrl ?? editAvatar });
+      setEditing(false);
       Taro.showToast({ title: '已保存', icon: 'success' });
     } catch {
       Taro.showToast({ title: '保存失败，请重试', icon: 'none' });

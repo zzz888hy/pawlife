@@ -376,7 +376,33 @@ exports.main = async (event) => {
         .where({ openid: OPENID, direction: 'incoming' })
         .orderBy('createdAt', 'desc')
         .get();
-      return { code: 0, data: await decorateAvatars(res.data) };
+
+      // 刷新每个申请里的昵称/头像为发送方最新资料：对方改过昵称/头像后，这里不再显示旧的「宠物主人」等快照值
+      const out = [];
+      for (const r of res.data) {
+        if (r.fromOpenid) {
+          const senderRes = await usersCol().where({ openid: r.fromOpenid }).get();
+          const senderDoc = senderRes.data[0];
+          if (senderDoc) {
+            const fresh = {
+              nickname: senderDoc.nickname || r.nickname,
+              avatar: senderDoc.avatarUrl || r.avatar,
+              petName: senderDoc.petName || r.petName,
+              petEmoji: senderDoc.petEmoji || r.petEmoji,
+              breed: senderDoc.breed || r.breed,
+            };
+            const dirty = ['nickname', 'avatar', 'petName', 'petEmoji', 'breed'].some((k) => fresh[k] !== r[k]);
+            if (dirty) {
+              await requestsCol().doc(r._id).update({ data: fresh });
+            }
+            out.push({ ...r, ...fresh });
+            continue;
+          }
+        }
+        out.push(r);
+      }
+
+      return { code: 0, data: await decorateAvatars(out) };
     }
 
     case 'acceptRequest': {

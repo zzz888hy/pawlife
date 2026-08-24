@@ -52,8 +52,8 @@ export async function getUserProfile(): Promise<UserData> {
 /**
  * 更新用户信息
  */
-export async function updateUserProfile(data: Record<string, unknown>): Promise<void> {
-  await callCloudFunction('user', { action: 'updateProfile', data });
+export async function updateUserProfile(data: Record<string, unknown>): Promise<UserData | null> {
+  return callCloudFunction<UserData>('user', { action: 'updateProfile', data });
 }
 
 /**
