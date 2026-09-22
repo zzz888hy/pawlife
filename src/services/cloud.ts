@@ -43,6 +43,29 @@ export async function callCloudFunction<T = unknown>(
 }
 
 /**
+ * 本次前端构建期望的云函数版本号。
+ * 必须与 cloudfunctions/{login,user,friend}/index.js 里的 BUILD 保持一致：
+ * 改动云函数后，把三处 BUILD 和这里的值一起 +1，再重新部署。
+ */
+export const EXPECTED_CLOUD_BUILD = '2026-09-22.1';
+
+/**
+ * 探测某个云函数当前部署的版本号。
+ * 返回 '' 表示云端是旧版代码（没有 build 字段，说明还没重新部署）；
+ * 返回 null 表示调用失败（函数不存在或网络异常）。
+ */
+export async function probeCloudBuild(name: string): Promise<string | null> {
+  if (MOCK_ENABLED) return EXPECTED_CLOUD_BUILD; // mock 模式没有云函数，视为一致
+  try {
+    const res = await Taro.cloud.callFunction({ name, data: { action: '__ping' } });
+    const result = res.result as { build?: string } | undefined;
+    return (result && result.build) || '';
+  } catch {
+    return null;
+  }
+}
+
+/**
  * 初始化云开发环境
  * 在 app.tsx 中调用
  */

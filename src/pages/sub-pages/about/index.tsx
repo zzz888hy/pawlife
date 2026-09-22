@@ -2,9 +2,13 @@ import { View, Text, ScrollView } from '@tarojs/components';
 import Taro from '@tarojs/taro';
 import SubPageHeader from '@/components/SubPageHeader';
 import { useAppStore } from '@/stores/useAppStore';
+import { probeCloudBuild, EXPECTED_CLOUD_BUILD } from '@/services/cloud';
 import './index.scss';
 
 const APP_VERSION = '1.0.0';
+
+// 与好友/私聊链路相关、必须保持最新的云函数
+const CLOUD_FUNCTIONS = ['login', 'user', 'friend'] as const;
 
 export default function AboutPage() {
   const showToast = useAppStore((s) => s.showToast);
@@ -29,8 +33,31 @@ export default function AboutPage() {
     });
   };
 
-  const handleCheckUpdate = () => {
-    showToast('当前已是最新版本');
+  // 逐个回读云函数部署版本，把「改了但云端还是旧代码」这个黑盒变成可见的
+  const handleCheckUpdate = async () => {
+    Taro.showLoading({ title: '检查中…' });
+    const results = await Promise.all(
+      CLOUD_FUNCTIONS.map(async (name) => ({ name, build: await probeCloudBuild(name) })),
+    );
+    Taro.hideLoading();
+
+    const lines = results.map(({ name, build }) => {
+      if (build === null) return `${name}：调用失败，可能未部署`;
+      if (build === '') return `${name}：旧版代码（无版本号）⚠️`;
+      return build === EXPECTED_CLOUD_BUILD ? `${name}：${build} ✅` : `${name}：${build} ⚠️`;
+    });
+    const allOk = results.every((r) => r.build === EXPECTED_CLOUD_BUILD);
+
+    if (allOk) {
+      showToast('云函数已是最新版本');
+      return;
+    }
+    Taro.showModal({
+      title: '云函数需要更新',
+      content: `前端期望：${EXPECTED_CLOUD_BUILD}\n\n${lines.join('\n')}\n\n请右键 cloudfunctions 下对应的函数 → 「上传并部署：云端安装依赖」。`,
+      showCancel: false,
+      confirmText: '知道了',
+    });
   };
 
   return (

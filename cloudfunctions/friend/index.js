@@ -5,6 +5,10 @@
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
+// 部署版本号：每次改动这个文件后要把它 +1，并在微信开发者工具里重新上传部署。
+// 前端「关于 → 检查更新」会回读这个值，用来确认云端跑的是不是最新代码。
+const BUILD = '2026-09-22.1';
+
 const db = cloud.database();
 
 const friendsCol = () => db.collection('friends');
@@ -164,7 +168,7 @@ async function ensureSeeded(OPENID) {
   }
 }
 
-exports.main = async (event) => {
+const handler = async (event) => {
   const { OPENID } = cloud.getWXContext();
   const { action, data } = event || {};
 
@@ -518,4 +522,10 @@ exports.main = async (event) => {
     default:
       return { code: 400, message: '未知操作' };
   }
+};
+
+// 统一在返回体里带上 BUILD，供前端探测云端部署版本
+exports.main = async (event) => {
+  const res = await handler(event);
+  return { ...res, build: BUILD };
 };

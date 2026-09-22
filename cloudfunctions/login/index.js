@@ -5,6 +5,10 @@
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 
+// 部署版本号：每次改动这个文件后要把它 +1，并在微信开发者工具里重新上传部署。
+// 前端「关于 → 检查更新」会回读这个值，用来确认云端跑的是不是最新代码。
+const BUILD = '2026-09-22.1';
+
 const db = cloud.database();
 
 // 用 openid 生成确定性的 4 位数字，作为默认昵称后缀（保证不同用户默认昵称不重复）
@@ -15,9 +19,14 @@ function nickSuffix(openid) {
   return 1000 + (h % 9000);
 }
 
-exports.main = async (event) => {
+const handler = async (event) => {
   const { OPENID } = cloud.getWXContext();
-  const { nickname, avatarUrl } = event || {};
+  const { nickname, avatarUrl, action } = event || {};
+
+  // 版本探测：不碰数据库，前端「检查更新」用它读 build
+  if (action === '__ping') {
+    return { code: 0, data: { ok: true } };
+  }
 
   const users = db.collection('users');
   const existing = await users.where({ openid: OPENID }).get();
@@ -56,4 +65,10 @@ exports.main = async (event) => {
   }
 
   return { code: 0, data: { ...user, isNew: false } };
+};
+
+// 统一在返回体里带上 BUILD，供前端探测云端部署版本
+exports.main = async (event) => {
+  const res = await handler(event);
+  return { ...res, build: BUILD };
 };
